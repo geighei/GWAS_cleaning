@@ -45,6 +45,7 @@ sumstat = pd.read_csv(args.sumstat_fp, delim_whitespace=True)
 	# if 23andMe is passed, drop all the missing rows so we only have the SNPs with effects
 if args.is_23andMe:
 	sumstat = sumstat.dropna(subset=['pvalue','effect'])
+	sumstat = sumstat[sumstat.pass=="Y"]
 # map
 legend = pd.read_csv(args.legend_fp, delim_whitespace=True, 
                      usecols=[map_coord_name, map_rs_name])
