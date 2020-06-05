@@ -40,16 +40,17 @@ else:
 	map_rs_name = "rsid"
 
 ## READ DATA
+# logging
+print("Mapping RS numbers to summary statistic at file: " + args.sumstat_fp)
 # sumstat
 sumstat = pd.read_csv(args.sumstat_fp, delim_whitespace=True)
 	# if 23andMe is passed, drop all the missing rows so we only have the SNPs with effects
 if args.is_23andMe:
 	sumstat = sumstat.dropna(subset=['pvalue','effect'])
-	sumstat = sumstat[sumstat.pass=="Y"]
+	sumstat = sumstat[sumstat["pass"]=="Y"]
 # map
 legend = pd.read_csv(args.legend_fp, delim_whitespace=True, 
-                     usecols=[map_coord_name, map_rs_name])
-
+                     usecols=[map_coord_name, map_rs_name], low_memory=False)
 
 ## CLEAN AND MERGE DATA
 # clean summary statistic coordinate column to ensure we get as many matches as possible
@@ -59,7 +60,10 @@ if not args.is_23andMe:
 	# needed for osteoarthritis
 	sumstat[args.sumstat_coord_name] = sumstat[args.sumstat_coord_name].str.replace("_.*$", "")
 
+
 # merge summary statistics with legend
+print("Merging summary statistic with RS-number legend using columns " +
+	args.sumstat_coord_name + " and " + map_coord_name + ".")
 joined = pd.merge(sumstat, legend, 
                   left_on=args.sumstat_coord_name, right_on=map_coord_name, how="left")
 
@@ -73,7 +77,8 @@ joined = joined.rename({args.sumstat_coord_name: "unique_id", map_rs_name : "SNP
 
 
 ## WRITE DATA
-print("Warning: ", 
-      sum(pd.isna(joined.SNP)), " of ", len(joined), 
+print("Mapping of file completed. ", 
+      sum(pd.isna(joined.SNP) | pd.isnan(joined.SNP)), " of ", len(joined), 
       " SNP coordinates were not matched with RS numbers.")
+print("Writing output to " + args.output_fp + ".")
 joined.to_csv(args.output_fp, index=False, sep='\t')
