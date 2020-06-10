@@ -1,0 +1,16 @@
+MARKER SNP
+DEFAULT 466571
+ALLELE A1 A2
+PVAL P
+EFFECT BETA
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/rGE/risk.sumstats
+
+MARKER SNP
+COLUMN LENIENT
+WEIGHT im.num.0
+PVAL pvalue
+EFFECT effect
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/raw/rGE/risk/23andMe/mapped_risk_preferences.dat
+
+OUTFILE risk_meta_analysis_ .tbl
+ANALYZE
