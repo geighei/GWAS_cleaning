@@ -392,7 +392,7 @@ munge <- function (files, trait.names = NULL, out_dir, effect_type = 'both',
     }
     if (b - nrow(sumstats) > 0) 
       cat(print(paste(b - nrow(sumstats), "rows were removed from the", 
-                      filenames[i], "summary statistics file due to missing values in the P-value column")), 
+                      "summary statistics file due to missing values in the P-value column")), 
           file = log.file, sep = "\n", append = TRUE)
     
     # Filter out missing beta value rows
@@ -402,7 +402,7 @@ munge <- function (files, trait.names = NULL, out_dir, effect_type = 'both',
     }
     if (b - nrow(sumstats) > 0) 
       cat(print(paste(b - nrow(sumstats), "rows were removed from the", 
-                      filenames[i], "summary statistics file due to missing values in the effect column")), 
+                      "summary statistics file due to missing values in the effect column")), 
           file = log.file, sep = "\n", append = TRUE)
     
     # If beta is determined to be an odds ratio, replace the column with the log of itself
@@ -423,6 +423,16 @@ munge <- function (files, trait.names = NULL, out_dir, effect_type = 'both',
       cat(print("In excess of 100 SNPs have P val above 1 or below 0. The P column may be mislabled!"), 
           file = log.file, sep = "\n", append = TRUE)
     }
+    
+    # Filter out missing SNP rows
+    b <- nrow(sumstats)
+    sumstats <- sumstats %>%
+      filter(!is.na(SNP) & !is.nan(SNP) & SNP != "NaN")
+    if(b - nrow(sumstats) > 0)
+      cat(print(paste(b - nrow(sumstats), "rows were removed from the",
+                      "summary statistics file due to missing values or NaN in the SNP column")), 
+          file = log.file, sep = "\n", append = TRUE)
+    
     
     # Filter out any rows with INFO values below user-inputted (or default) threshold
     sumstats$Z <- sign(sumstats[[effect_name_final]]) * sqrt(qchisq(sumstats$P, 1, lower = F))

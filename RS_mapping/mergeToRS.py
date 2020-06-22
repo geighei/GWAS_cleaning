@@ -35,9 +35,11 @@ if args.is_23andMe:
 	                  str(args.legend_fp) + ".txt")
 	map_coord_name = "all.data.id"
 	map_rs_name = "assay.name"
+	legend_cols = [map_coord_name, map_rs_name, "alleles"]
 else:
 	map_coord_name = "coord"
 	map_rs_name = "rsid"
+	legend_cols = [map_coord_name, map_rs_name]
 
 ## READ DATA
 # logging
@@ -49,8 +51,7 @@ if args.is_23andMe:
 	sumstat = sumstat.dropna(subset=['pvalue','effect'])
 	sumstat = sumstat[sumstat["pass"]=="Y"]
 # map
-legend = pd.read_csv(args.legend_fp, delim_whitespace=True, 
-                     usecols=[map_coord_name, map_rs_name], low_memory=False)
+legend = pd.read_csv(args.legend_fp, delim_whitespace=True, usecols=legend_cols)
 
 ## CLEAN AND MERGE DATA
 # clean summary statistic coordinate column to ensure we get as many matches as possible
@@ -71,14 +72,23 @@ sumstat_cols = sumstat.columns
 del sumstat
 del legend
 
-joined = joined[sumstat_cols.append(pd.Index([map_rs_name]))]
+# allele cleaning for 23 and Me since the stats also don't have this info
+if args.is_23andMe:
+	# "alleles" column is of form "A/C"; effect corresponds to reference allele which is "alphabetically greater" 
+	# split and change legend_cols so we keep new allele cols
+	joined[["A2","A1"]] = joined["alleles"].str.split('/',expand=True)
+	legend_cols.remove("alleles")
+	legend_cols.extend(["A1", "A2"])
 
+# select only the columns we need and rename to standardize
+legend_cols.remove(map_coord_name)
+joined = joined[sumstat_cols.append(pd.Index(legend_cols))]
 joined = joined.rename({args.sumstat_coord_name: "unique_id", map_rs_name : "SNP"}, axis="columns")
 
 
 ## WRITE DATA
 print("Mapping of file completed. ", 
-      sum(pd.isna(joined.SNP) | pd.isnan(joined.SNP)), " of ", len(joined), 
-      " SNP coordinates were not matched with RS numbers.")
-print("Writing output to " + args.output_fp + ".")
-joined.to_csv(args.output_fp, index=False, sep='\t')
+      sum(pd.isna(joined["SNP"]) | joined["SNP"].isnull()), 
+      " of ", len(joined), " SNP coordinates were not matched with RS numbers.")
+print("Writing output to " + args.output_fp + "." + "\n")
+joined.to_csv(args.output_fp, index=False, sep='\t', na_rep="NA")

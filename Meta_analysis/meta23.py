@@ -20,7 +20,7 @@ def meta23(pheno, fp_23, N):
 	cmd.write("MARKER SNP" + "\n" +
 	          "COLUMN LENIENT" + "\n" +
 	          "WEIGHT im.num.0" + "\n" +
-	          #"ALLELE " + "\n" + 
+	          "ALLELE A1 A2" + "\n" + 
 	          "PVAL pvalue" + "\n" +
 	          "EFFECT effect" + "\n" +
 	          "PROCESS " + gwas_fp + fp_23 + "\n" + "\n")
