@@ -30,12 +30,13 @@ option_list = list(
   # command-line argument for GWAS file path map
   make_option(c("-m", "--map"), type="character", default=NULL, 
               help="Phenotype filepath map", metavar="character"),
-  make_option(c("-p", "--pheno_names"), type="character", default=".*",
-              help="OPTIONAL: Subset of phenotypes to munge, separated by commas (no spaces), e.g. neuroticismScore,arthritis", 
-              metavar="character"),
   # argument for directory where we write cleaned GWASs
   make_option(c("-o", "--out"), type="character", default=NULL, 
-              help="Output file path", metavar="character")) 
+              help="Output file path", metavar="character"),
+  # optional argument: choose subset of phenotypes to clean
+  make_option(c("-p", "--pheno_names"), type="character", default=".*",
+              help="OPTIONAL: Subset of phenotypes to munge, separated by commas (no spaces), e.g. neuroticismScore,arthritis", 
+              metavar="character")) 
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
 
@@ -52,6 +53,7 @@ if (is.null(opt$dir)) {
 # Load Munge function from separate module
 CODE <- "./"
 source(paste0(CODE, "Munge.R"))
+source(paste0(CODE, "Munge_exceptions.R"))
 
 ## ----------------------------- Munge GWASs -------------------------------
 
@@ -80,15 +82,20 @@ or_GWAS <- GWAS_list_clean %>%
 
 # Run munge for all traits requested by the user, running continuous and OR variables in separate calls
 if (nrow(beta_GWAS) > 0){
-  munge(files = beta_GWAS$File_Path, trait.names = beta_GWAS$Pheno_Name, 
+  munge(files = beta_GWAS$File_Path, trait_names = beta_GWAS$Pheno_Name, 
         out_dir = opt$out, effect_type = "beta")
 } else { 
   writeLines("Note: None of provided phenotypes are continuous.") 
 }
 
 if (nrow(or_GWAS) > 0){
-  munge(files = or_GWAS$File_Path, trait.names = or_GWAS$Pheno_Name, 
+  munge(files = or_GWAS$File_Path, trait_names = or_GWAS$Pheno_Name, 
         out_dir = opt$out, effect_type = "or") 
 } else { 
   writeLines("Note: None of provided phenotypes are odds ratios.") 
 }
+
+## ----------------------------- Munge exceptions -------------------------------
+# run list of traits through munge exception function to clean exception files and overwrite (as side effect, hence 'walk')
+GWAS_list_clean$Pheno_Name %>%
+  walk(~ postMunge(., dir = opt$out))

@@ -86,11 +86,11 @@ cleanNames <- function(df, iter) {
 
 # --------------------------------------  Munge function ----------------------------------------------------
 
-munge <- function (files, trait.names = NULL, out_dir, effect_type = 'both', 
+munge <- function (files, trait_names = NULL, out_dir, effect_type = 'both', 
                    N, info.filter = 0, maf.filter = 0) 
   # Input Parameters:
   #   files - list of summary statistic files to be "munged" or cleaned and QC'ed
-  #   trait.names - list of phenotype/trait names associated with each summary statistic file in 'files'
+  #   trait_names - list of phenotype/trait names associated with each summary statistic file in 'files'
   #   out_dir - file path to write "munged" output files and logging file to
   #   effect_type - string describing expected "effect" type; either 'both', 'beta', or 'or'
   #   N - optional argument giving sample size of summary statistic file
@@ -148,7 +148,7 @@ munge <- function (files, trait.names = NULL, out_dir, effect_type = 'both',
   log2 <- format(Sys.time(), "%F_%H%M")
   log.file <- file(paste0(out_dir, log2, "_munge.log"), open = "wt")
   begin.time <- Sys.time()
-  cat(print(paste0("The munging of ", length(trait.names), 
+  cat(print(paste0("The munging of ", length(trait_names), 
                    " summary statistics started at ", begin.time), sep = "", quote=F), 
       file = log.file, sep = "\n", append=TRUE)
   
@@ -457,12 +457,12 @@ munge <- function (files, trait.names = NULL, out_dir, effect_type = 'both',
     cat(print(paste(nrow(output), "SNPs are left in the summary statistics file", 
                     filenames[i], "after QC.")), file = log.file, sep = "\n", 
         append = TRUE)
-    write.table(x = output, file = paste0(out_dir, trait.names[i], ".sumstats"),
+    write.table(x = output, file = paste0(out_dir, trait_names[i], ".sumstats"),
                 sep = "\t", quote = FALSE, row.names = F)
-    #gzip(paste0(trait.names[i], ".sumstats"))
+    #gzip(paste0(trait_names[i], ".sumstats"))
     cat(print(paste("I am done munging file:", filenames[i])), 
         file = log.file, sep = "\n", append = TRUE)
-    # cat(print(paste("The file is saved as", paste0(trait.names[i], 
+    # cat(print(paste("The file is saved as", paste0(trait_names[i], 
     #                                                ".sumstats.gz"), "in the current working directory.")), 
     #     file = log.file, sep = "\n", append = TRUE)
   }
