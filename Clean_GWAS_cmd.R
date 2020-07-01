@@ -21,6 +21,7 @@ library(stringr)
 library(magrittr)
 library(readxl)
 library(optparse)
+library(funr)
 
 # Read Command-line arguments
 option_list = list(
@@ -36,7 +37,10 @@ option_list = list(
   # optional argument: choose subset of phenotypes to clean
   make_option(c("-p", "--pheno_names"), type="character", default=".*",
               help="OPTIONAL: Subset of phenotypes to munge, separated by commas (no spaces), e.g. neuroticismScore,arthritis", 
-              metavar="character")) 
+              metavar="character"),
+  # optional argument: only perform post-munge process
+  make_option("--post", type="logical", action = "store_true", default = FALSE,
+              help="OPTIONAL: include flag if you only want to run munge exceptions code (a.k.a. post munge)")) 
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
 
@@ -51,9 +55,10 @@ if (is.null(opt$dir)) {
 }
 
 # Load Munge function from separate module
-CODE <- "./"
-source(paste0(CODE, "Munge.R"))
-source(paste0(CODE, "Munge_exceptions.R"))
+CODE <- funr::get_script_path()
+CODE <- ifelse(is_null(CODE), ".", CODE)
+source(paste0(CODE, "/Munge.R"))
+source(paste0(CODE, "/Munge_exceptions.R"))
 
 ## ----------------------------- Munge GWASs -------------------------------
 
@@ -74,25 +79,27 @@ GWAS_list_clean <- GWAS_list %>%
   # Convert from relative to absolute file path
   mutate(File_Path = str_c(opt$dir, File_Path))
 
-# run OR and BETA GWAS through munge separately since it helps the program discern which effect column to use
-beta_GWAS <- GWAS_list_clean %>%
-  filter(Type == "beta")
-or_GWAS <- GWAS_list_clean %>%
-  filter(Type == "or")
-
-# Run munge for all traits requested by the user, running continuous and OR variables in separate calls
-if (nrow(beta_GWAS) > 0){
-  munge(files = beta_GWAS$File_Path, trait_names = beta_GWAS$Pheno_Name, 
-        out_dir = opt$out, effect_type = "beta")
-} else { 
-  writeLines("Note: None of provided phenotypes are continuous.") 
-}
-
-if (nrow(or_GWAS) > 0){
-  munge(files = or_GWAS$File_Path, trait_names = or_GWAS$Pheno_Name, 
-        out_dir = opt$out, effect_type = "or") 
-} else { 
-  writeLines("Note: None of provided phenotypes are odds ratios.") 
+if(!opt$post){
+  # run OR and BETA GWAS through munge separately since it helps the program discern which effect column to use
+  beta_GWAS <- GWAS_list_clean %>%
+    filter(Type == "beta")
+  or_GWAS <- GWAS_list_clean %>%
+    filter(Type == "or")
+  
+  # Run munge for all traits requested by the user, running continuous and OR variables in separate calls
+  if (nrow(beta_GWAS) > 0){
+    munge(files = beta_GWAS$File_Path, trait_names = beta_GWAS$Pheno_Name, 
+          out_dir = opt$out, effect_type = "beta")
+  } else { 
+    writeLines("Note: None of provided phenotypes are continuous.") 
+  }
+  
+  if (nrow(or_GWAS) > 0){
+    munge(files = or_GWAS$File_Path, trait_names = or_GWAS$Pheno_Name, 
+          out_dir = opt$out, effect_type = "or") 
+  } else { 
+    writeLines("Note: None of provided phenotypes are odds ratios.") 
+  }
 }
 
 ## ----------------------------- Munge exceptions -------------------------------

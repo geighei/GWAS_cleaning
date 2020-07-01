@@ -83,6 +83,8 @@ cleanNames <- function(df, iter) {
   return(df)
 }
 
+'%not in%' <- function(x,y)!('%in%'(x,y))
+
 
 # --------------------------------------  Munge function ----------------------------------------------------
 
@@ -438,7 +440,8 @@ munge <- function (files, trait_names = NULL, out_dir, effect_type = 'both',
     sumstats$Z <- sign(sumstats[[effect_name_final]]) * sqrt(qchisq(sumstats$P, 1, lower = F))
    
     # Note: we rename OR to BETA at this point since LogOR is treated as a continuous effect
-    names(sumstats) <- str_replace_all(names(sumstats), "^OR$", "BETA")
+    if("BETA" %not in% names(sumstats))
+      names(sumstats) <- str_replace_all(names(sumstats), "^OR$", "BETA")
     
     ## ----------- Construct and write output --------------------------------
     # Construct output data frame with relevant columns, including a column for sample size if it doesn't already exist,

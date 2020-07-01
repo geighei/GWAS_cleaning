@@ -46,8 +46,8 @@ else:
 print("Mapping RS numbers to summary statistic at file: " + args.sumstat_fp)
 # sumstat
 sumstat = pd.read_csv(args.sumstat_fp, delim_whitespace=True)
-	# if 23andMe is passed, drop all the missing rows so we only have the SNPs with effects
 if args.is_23andMe:
+	# if 23andMe is passed, drop all the missing rows so we only have the SNPs with effects that passed QC
 	sumstat = sumstat.dropna(subset=['pvalue','effect'])
 	sumstat = sumstat[sumstat["pass"]=="Y"]
 # map

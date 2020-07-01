@@ -20,7 +20,7 @@ flip_list <- c(
 negate_list <- c(
   # Smoking cessation was defined as 2 for current smokers and 1 for former smokers, the directional opposite of our
   # phenotypic measure, which codes current smokers as 0 and former smokers as 1
-  'cesSmoke')
+  'cesSmoke', 'cancerBreast')
 master_list <-  c(flip_list, negate_list)
 
 # Read inputted trait's munged sumstat, perform additional operations required for exception, then overwrite sumstat file
@@ -49,6 +49,6 @@ flipAlleles <- function(sumstat){
 
 # Negate the effect column, possibly because our phenotype is measured in opposite direction as GWAS sumstat
 negateBetas <- function(sumstat){
-  sumstat[BETA] <- -1 * sumstat[BETA]
+  sumstat["BETA"] <- -1 * sumstat["BETA"]
   return(sumstat)
 }
