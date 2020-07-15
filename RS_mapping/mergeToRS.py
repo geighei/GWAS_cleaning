@@ -72,8 +72,17 @@ sumstat_cols = sumstat.columns
 del sumstat
 del legend
 
-# allele cleaning for 23 and Me since the stats also don't have this info
+# allele and snp cleaning for 23 and Me since the stats also don't have this info
 if args.is_23andMe:
+	# read in list of 1kG flipped SNPs that must be removed
+	problematic_coords = pd.read_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/supplementary/23andMe_SNPs/1000G_flipped_all_SNPID.txt",
+	                               header=None, delim_whitespace=True)
+	# re-format chr and position columns so we have chr:pos column
+	joined["chr_pos"] = joined["scaffold"].str.strip("chr") + ":" + legend["position"].astype(str))
+	# identify set of coords in df that aren't problematic and filter data frame on them
+	good_coords = set(joined.chr_pos).difference(problematic_coords[0])
+	joined = joined[joined.chr_pos.isin(good_coords)]
+
 	# "alleles" column is of form "A/C"; effect corresponds to reference allele which is "alphabetically greater" 
 	# split and change legend_cols so we keep new allele cols
 	joined[["A2","A1"]] = joined["alleles"].str.split('/',expand=True)

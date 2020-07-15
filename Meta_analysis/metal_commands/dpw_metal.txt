@@ -1,0 +1,18 @@
+MARKER SNP
+DEFAULT 100000
+WEIGHT N
+ALLELE A1 A2
+PVAL P
+EFFECT BETA
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats//clean/notUKB/dpw.sumstats
+
+MARKER SNP
+COLUMN LENIENT
+WEIGHT im.num.0
+ALLELE A1 A2
+PVAL pvalue
+EFFECT effect
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats//raw/23andMe/alcohol/mapped_GSCAN_drinking_per_week_tx.dat
+
+OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats//clean/notUKB/dpw_meta23_ .tbl
+ANALYZE

@@ -16,7 +16,7 @@
 
 flip_list <- c(
   # Liu et al. 2019, alleles must be flipped because beta reported corresponds to alternate rather than reference allele
-  'drinkWeek','maxCPD', 'cesSmoke', 'ageSmoke', 'smokeInit')
+  'drinkWeek','maxCPD', 'cesSmoke', 'ageSmoke', 'smokeInit', 'dpw')
 negate_list <- c(
   # Smoking cessation was defined as 2 for current smokers and 1 for former smokers, the directional opposite of our
   # phenotypic measure, which codes current smokers as 0 and former smokers as 1
