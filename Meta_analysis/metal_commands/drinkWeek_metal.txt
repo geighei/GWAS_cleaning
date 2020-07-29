@@ -14,5 +14,5 @@ PVAL pvalue
 EFFECT effect
 PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/GSCAN_drinking_per_week_tx.dat
 
-OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/drinkWeek_GSES_meta23_ .tbl
+OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/drinkWeek_GSES_meta23_ .tbl
 ANALYZE
