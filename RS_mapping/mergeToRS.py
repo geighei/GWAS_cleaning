@@ -35,7 +35,7 @@ if args.is_23andMe:
 	                  str(args.legend_fp) + ".txt")
 	map_coord_name = "all.data.id"
 	map_rs_name = "assay.name"
-	legend_cols = [map_coord_name, map_rs_name, "alleles"]
+	legend_cols = [map_coord_name, map_rs_name, "alleles", "scaffold", "position"]
 else:
 	map_coord_name = "coord"
 	map_rs_name = "rsid"
@@ -78,7 +78,7 @@ if args.is_23andMe:
 	problematic_coords = pd.read_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/supplementary/23andMe_SNPs/1000G_flipped_all_SNPID.txt",
 	                               header=None, delim_whitespace=True)
 	# re-format chr and position columns so we have chr:pos column
-	joined["chr_pos"] = joined["scaffold"].str.strip("chr") + ":" + legend["position"].astype(str))
+	joined["chr_pos"] = joined["scaffold"].str.strip("chr") + ":" + joined["position"].astype(str)
 	# identify set of coords in df that aren't problematic and filter data frame on them
 	good_coords = set(joined.chr_pos).difference(problematic_coords[0])
 	joined = joined[joined.chr_pos.isin(good_coords)]
@@ -86,7 +86,7 @@ if args.is_23andMe:
 	# "alleles" column is of form "A/C"; effect corresponds to reference allele which is "alphabetically greater" 
 	# split and change legend_cols so we keep new allele cols
 	joined[["A2","A1"]] = joined["alleles"].str.split('/',expand=True)
-	legend_cols.remove("alleles")
+	legend_cols = [i for i in legend_cols if i not in ["alleles", "scaffold", "position"]]
 	legend_cols.extend(["A1", "A2"])
 
 # select only the columns we need and rename to standardize

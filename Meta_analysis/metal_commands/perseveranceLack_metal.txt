@@ -1,0 +1,18 @@
+MARKER SNP
+DEFAULT 22861.0
+WEIGHT N
+ALLELE A1 A2
+PVAL P
+EFFECT BETA
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/rGE/perseveranceLack.sumstats
+
+MARKER SNP
+COLUMN LENIENT
+WEIGHT im.num.0
+ALLELE A1 A2
+PVAL pvalue
+EFFECT effect
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/MCQ_mean_Log10_K_DecisionMaking_Filtered.5.1.dat
+
+OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/perseveranceLack_GSES_meta23_ .tbl
+ANALYZE

@@ -1,0 +1,18 @@
+MARKER SNP
+DEFAULT 1359002.0
+WEIGHT N
+ALLELE A1 A2
+PVAL P
+EFFECT BETA
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/rGE/smokeInit.sumstats
+
+MARKER SNP
+COLUMN LENIENT
+WEIGHT im.num.0
+ALLELE A1 A2
+PVAL pvalue
+EFFECT effect
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/ever_tobacco_user.dat
+
+OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/smokeInit_GSES_meta23_ .tbl
+ANALYZE

@@ -1,0 +1,18 @@
+MARKER SNP
+DEFAULT nan
+WEIGHT N
+ALLELE A1 A2
+PVAL P
+EFFECT BETA
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/rGE/AUDIT.sumstats
+
+MARKER SNP
+COLUMN LENIENT
+WEIGHT im.num.0
+ALLELE A1 A2
+PVAL pvalue
+EFFECT effect
+PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/AUDIT_Log10_total_clean_DecisionMaking_Filtered.dat
+
+OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/AUDIT_GSES_meta23_ .tbl
+ANALYZE

@@ -57,18 +57,17 @@ This version released on 2011-03-25
 #   RETURN
 #   QUIT
 
-# Processing commands in /home/ubuntu/biroli/geighei/code/GWAS_cleaning/Meta_analysis/metal_commands/risk_metal.txt ...
+# Processing commands in /home/ubuntu/biroli/geighei/code/GWAS_cleaning/Meta_analysis/metal_commands/perseveranceLack_metal.txt ...
 ## Set marker header to SNP ...
-## Set default weight to 466571.00 ...
+## Set default weight to 22861.00 ...
 ## Set weight header to N ...
 ## Set allele headers to A1 and A2 ...
 ## Set p-value header to P ...
 ## Set effect header to BETA ...
 ###########################################################################
-## Processing file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/rGE/risk.sumstats'
-## WARNING: No 'N' column found -- using DEFAULTWEIGHT = 466571
-## WARNING: Marker 'rs146495449' duplicated in input, first instance used, others skipped
-## Processed 11417255 markers ...
+## Processing file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/rGE/perseveranceLack.sumstats'
+## WARNING: No 'N' column found -- using DEFAULTWEIGHT = 22861
+## Processed 10000 markers ...
 
 ## Set marker header to SNP ...
 ## LENIENT MODE: Input lines can include extra columns, which will be ignored
@@ -77,37 +76,37 @@ This version released on 2011-03-25
 ## Set p-value header to pvalue ...
 ## Set effect header to effect ...
 ###########################################################################
-## Processing file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/risk_preferences.dat'
-## WARNING: Bad alleles for marker 'rs117232355', expecting 'a/c' found 'a/g'
-## WARNING: Bad alleles for marker 'rs2802340', expecting 'a/t' found 'a/g'
-## WARNING: Bad alleles for marker 'rs115841782', expecting 'a/c' found 'c/g'
-## WARNING: Bad alleles for marker 'rs17101261', expecting 'a/g' found 'a/c'
-## WARNING: Bad alleles for marker 'rs12027636', expecting 'a/t' found 'a/g'
-## WARNING: Bad alleles for marker 'rs186516802', expecting 'c/g' found 'a/g'
-## WARNING: Bad alleles for marker 'rs3066510', expecting 'a/c' found 'd/i'
-## WARNING: Bad alleles for marker 'rs140602714', expecting 'a/c' found 'a/g'
-## WARNING: Bad alleles for marker 'rs75418714', expecting 'a/g' found 'a/c'
-## WARNING: Bad alleles for marker 'rs56388120', expecting 'c/g' found 'a/g'
-## WARNING: Bad alleles for marker 'rs115388550', expecting 'a/g' found 'a/c'
-## WARNING: Bad alleles for marker 'rs79562395', expecting 'a/c' found 'a/g'
-## WARNING: Bad alleles for marker 'rs74130943', expecting 'a/g' found 'a/t'
-## WARNING: Bad alleles for marker 'rs184657175', expecting 'a/g' found 'a/c'
-## WARNING: Bad alleles for marker 'rs74156426', expecting 'a/c' found 'a/g'
-## WARNING: Bad alleles for marker 'rs2919488', expecting 'a/t' found 'a/c'
-## WARNING: Bad alleles for marker 'rs1349672', expecting 'a/c' found 'c/g'
-## WARNING: Bad alleles for marker 'rs141017039', expecting 'a/g' found 'a/c'
-## WARNING: Bad alleles for marker 'rs2488468', expecting 'a/c' found 'd/i'
-## WARNING: Bad alleles for marker 'rs822734', expecting 'a/g' found 'a/c'
-## WARNING: Allele names don't match previous occurences at 333 additional markers
-## Processed 11507870 markers ...
+## Processing file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/MCQ_mean_Log10_K_DecisionMaking_Filtered.5.1.dat'
+## WARNING: Bad alleles for marker 'rs139376790', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs33937111', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs77229075', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs201737335', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs59052781', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs200620092', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs202139388', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs35796081', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs200574131', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs202154959', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs79588010', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs34495254', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs138178761', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs201647396', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs138698725', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs202058433', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs200283716', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs71788656', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs145604727', expecting 'na/na' found 'd/i'
+## WARNING: Bad alleles for marker 'rs5773037', expecting 'na/na' found 'd/i'
+## WARNING: Allele names don't match previous occurences at 599 additional markers
+## Processed 11507575 markers ...
 
-## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/risk_GSES_meta23_ and .tbl ...
+## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/perseveranceLack_GSES_meta23_ and .tbl ...
 ###########################################################################
 ## Executing meta-analysis ...
-## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/risk_GSES_meta23_1.tbl'
-## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/risk_GSES_meta23_1.tbl.info'
-## Completed meta-analysis for 13864121 markers!
-## Smallest p-value is 1.608e-34 at marker 'rs62250712'
+## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/perseveranceLack_GSES_meta23_1.tbl'
+## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/perseveranceLack_GSES_meta23_1.tbl.info'
+## Completed meta-analysis for 11508185 markers!
+## Smallest p-value is 1.668e-08 at marker 'rs6528024'
 
 ## Clearing all stored statistics ...
 # Clearing user defined filters ...

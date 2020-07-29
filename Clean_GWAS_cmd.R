@@ -35,7 +35,7 @@ option_list = list(
   make_option(c("-o", "--out"), type="character", default=NULL, 
               help="Output file path", metavar="character"),
   # optional argument: choose subset of phenotypes to clean
-  make_option(c("-p", "--pheno_names"), type="character", default=".*",
+  make_option(c("-p", "--pheno"), type="character", default=".*",
               help="OPTIONAL: Subset of phenotypes to munge, separated by commas (no spaces), e.g. neuroticismScore,arthritis", 
               metavar="character"),
   # optional argument: only perform post-munge process
@@ -74,7 +74,7 @@ GWAS_list_clean <- GWAS_list %>%
   # If provided, keep only the user-provided phenotypes; if not, keep all ("." match)
   filter(str_detect(Pheno_Name,
                     str_c("^",
-                          str_replace_all(opt$pheno_names, pattern = ",|;", replacement = "$|^"),
+                          str_replace_all(opt$pheno, pattern = ",|;", replacement = "$|^"),
                           "$"))) %>%
   # Convert from relative to absolute file path
   mutate(File_Path = str_c(opt$dir, File_Path))

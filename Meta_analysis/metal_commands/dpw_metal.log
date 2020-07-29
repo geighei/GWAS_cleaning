@@ -65,7 +65,7 @@ This version released on 2011-03-25
 ## Set p-value header to P ...
 ## Set effect header to BETA ...
 ###########################################################################
-## Processing file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats//clean/notUKB/dpw.sumstats'
+## Processing file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/notUKB/dpw.sumstats'
 ## WARNING: Marker 'rs113018407' duplicated in input, first instance used, others skipped
 ## Processed 14051555 markers ...
 
@@ -76,7 +76,7 @@ This version released on 2011-03-25
 ## Set p-value header to pvalue ...
 ## Set effect header to effect ...
 ###########################################################################
-## Processing file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats//raw/23andMe/alcohol/mapped_GSCAN_drinking_per_week_tx.dat'
+## Processing file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/GSCAN_drinking_per_week_tx.dat'
 ## WARNING: Bad alleles for marker 'rs754572151', expecting 'a/g' found 'a/c'
 ## WARNING: Bad alleles for marker 'rs189868986', expecting 'a/g' found 'a/c'
 ## WARNING: Bad alleles for marker 'rs32612', expecting 'c/g' found 'a/g'
@@ -86,14 +86,14 @@ This version released on 2011-03-25
 ## WARNING: Bad alleles for marker 'rs184405692', expecting 'a/c' found 'x/y'
 ## WARNING: Bad alleles for marker 'rs745591395', expecting 'c/g' found 'a/g'
 ## WARNING: Bad alleles for marker 'rs112402989', expecting 'a/g' found 'x/y'
-## Processed 14716554 markers ...
+## Processed 14715952 markers ...
 
-## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats//clean/notUKB/dpw_meta23_ and .tbl ...
+## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/notUKB/dpw_meta23_ and .tbl ...
 ###########################################################################
 ## Executing meta-analysis ...
-## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats//clean/notUKB/dpw_meta23_1.tbl'
-## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats//clean/notUKB/dpw_meta23_1.tbl.info'
-## Completed meta-analysis for 17946976 markers!
+## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/notUKB/dpw_meta23_1.tbl'
+## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/notUKB/dpw_meta23_1.tbl.info'
+## Completed meta-analysis for 17946968 markers!
 ## Smallest p-value is 6.46e-235 at marker 'rs1229984'
 
 ## Clearing all stored statistics ...
