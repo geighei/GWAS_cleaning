@@ -81,11 +81,11 @@ This version released on 2011-03-25
 ## WARNING: Bad alleles for marker 'rs112402989', expecting 'a/g' found 'x/y'
 ## Processed 14715959 markers ...
 
-## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/maxCPD_GSES_meta23_ and .tbl ...
+## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/maxCPD_GSES_meta23_ and .tbl ...
 ###########################################################################
 ## Executing meta-analysis ...
-## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/maxCPD_GSES_meta23_1.tbl'
-## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/maxCPD_GSES_meta23_1.tbl.info'
+## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/maxCPD_GSES_meta23_1.tbl'
+## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/maxCPD_GSES_meta23_1.tbl.info'
 ## Completed meta-analysis for 16226616 markers!
 ## Smallest p-value is 4.31e-292 at marker 'rs10519203'
 

@@ -14,5 +14,5 @@ PVAL pvalue
 EFFECT effect
 PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/education_years_5.1.dat
 
-OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/educYears_GSES_meta23_ .tbl
+OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/educYears_GSES_meta23_ .tbl
 ANALYZE

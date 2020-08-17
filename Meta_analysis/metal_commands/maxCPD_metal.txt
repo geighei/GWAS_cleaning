@@ -14,5 +14,5 @@ PVAL pvalue
 EFFECT effect
 PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/packs_per_day.dat
 
-OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/maxCPD_GSES_meta23_ .tbl
+OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/maxCPD_GSES_meta23_ .tbl
 ANALYZE

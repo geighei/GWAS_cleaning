@@ -27,7 +27,7 @@ for row in map.itertuples(index=False):
 	       "--n", str(row.N),
 	       "--out", metal_output_fp])
 	# Read metal output file
-	metal_output = pd.read_csv(metal_output_fp, delim_whitespace=True)
+	metal_output = pd.read_csv(metal_output_fp + "_1.tbl", delim_whitespace=True)
 	# Edit column titles to align with PRSice-friendly column titles from main sumstat
 	metal_output = metal_output.rename({"MarkerName":"SNP", "Allele1":"A1", "Allele2":"A2",
 	                                   "Weight":"N", "Zscore" : "BETA", "P-value" : "P"}, 

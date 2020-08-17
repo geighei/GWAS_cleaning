@@ -82,11 +82,11 @@ This version released on 2011-03-25
 ## WARNING: Bad alleles for marker 'rs112402989', expecting 'a/g' found 'x/y'
 ## Processed 25218928 markers ...
 
-## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/smokeInit_GSES_meta23_ and .tbl ...
+## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/smokeInit_GSES_meta23_ and .tbl ...
 ###########################################################################
 ## Executing meta-analysis ...
-## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/smokeInit_GSES_meta23_1.tbl'
-## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/smokeInit_GSES_meta23_1.tbl.info'
+## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/smokeInit_GSES_meta23_1.tbl'
+## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/smokeInit_GSES_meta23_1.tbl.info'
 ## Completed meta-analysis for 26339817 markers!
 ## Smallest p-value is 2.882e-58 at marker 'rs2155646'
 

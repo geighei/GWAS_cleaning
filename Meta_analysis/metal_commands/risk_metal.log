@@ -101,11 +101,11 @@ This version released on 2011-03-25
 ## WARNING: Allele names don't match previous occurences at 333 additional markers
 ## Processed 11507870 markers ...
 
-## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/risk_GSES_meta23_ and .tbl ...
+## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/risk_GSES_meta23_ and .tbl ...
 ###########################################################################
 ## Executing meta-analysis ...
-## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/risk_GSES_meta23_1.tbl'
-## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/risk_GSES_meta23_1.tbl.info'
+## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/risk_GSES_meta23_1.tbl'
+## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/risk_GSES_meta23_1.tbl.info'
 ## Completed meta-analysis for 13864121 markers!
 ## Smallest p-value is 1.608e-34 at marker 'rs62250712'
 

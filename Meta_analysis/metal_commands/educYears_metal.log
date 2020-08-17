@@ -94,11 +94,11 @@ This version released on 2011-03-25
 ## WARNING: Bad alleles for marker 'rs7249319', expecting 'c/g' found 'a/g'
 ## Processed 11436380 markers ...
 
-## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/educYears_GSES_meta23_ and .tbl ...
+## Set output file prefix and suffix to /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/educYears_GSES_meta23_ and .tbl ...
 ###########################################################################
 ## Executing meta-analysis ...
-## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/educYears_GSES_meta23_1.tbl'
-## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/educYears_GSES_meta23_1.tbl.info'
+## Complete results will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/educYears_GSES_meta23_1.tbl'
+## Column descriptions will be stored in file '/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/educYears_GSES_meta23_1.tbl.info'
 ## Completed meta-analysis for 12631840 markers!
 ## Smallest p-value is 1.964e-85 at marker 'rs9859556'
 

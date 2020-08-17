@@ -14,5 +14,5 @@ PVAL pvalue
 EFFECT effect
 PROCESS /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/23andMe/GSCAN_smoking_cessation.dat
 
-OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metaOutput/cesSmoke_GSES_meta23_ .tbl
+OUTFILE /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/metalOutput/cesSmoke_GSES_meta23_ .tbl
 ANALYZE
