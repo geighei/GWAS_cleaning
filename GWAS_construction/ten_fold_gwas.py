@@ -33,32 +33,32 @@ n_samples = len(fam.index)
 fam["random"] = np.random.choice(n_samples, n_samples, replace=False)
 fam["fold"] = fam.random % 10
 
-for fold in np.arange(1):
+for fold in np.arange(1,2):
 	# select fold subset and write to drive
 	fold_ids = fam[fam.fold == fold][["FID", "IID"]]
 	fold_ids_fp = construction_data + "fold" + str(fold) + ".txt"
 	fold_ids.to_csv(fold_ids_fp, sep="\t", index=False, header=False)
 
 	# construct regenie calls, excluding the IDs corresponding to this iteration's fold
-	step1_cmd = [regenie_exe,
-				"--step 1",
-				"--remove " + fold_ids_fp,
-				"--bed " + geno,
-				"--c " + covars,
-				"--p " + phenos,
-				"--b 1000",
-				"--o " + construction_data + "dpw_leaveout" + str(fold)]
+	step1_cmd = [regenie_exe, 
+			"--step", "1",
+			"--remove", fold_ids_fp,
+			"--bed", geno,
+			"--c", covars,
+			"--p", phenos,
+			"--b", "1000",
+			"--o", construction_data + "dpw_leaveout" + str(fold)]
 	step2_cmd = [regenie_exe,
-				"--step 2",
-				"--remove " + fold_ids_fp,
-				"--bed " + geno,
-				"--c " + covars,
-				"--p " + phenos,
-				"--b 200",
-				"--pred " + construction_data + "dpw_leaveout" + str(fold) + "_pred.list",
-				"--split",
-				"--o /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/dpw_leaveout" + str(fold)]
+			"--step", "2",
+			"--remove", fold_ids_fp,
+			"--bed", geno,
+			"--c", covars,
+			"--p", phenos,
+			"--b", "200",
+			"--pred", construction_data + "dpw_leaveout" + str(fold) + "_pred.list",
+			"--split",
+			"--o", "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/dpw_leaveout" + str(fold)]
 
 	# call regenie
-	test1 = subprocess.run(" ".join(step1_cmd), universal_newlines=True, shell=True)
-	test2 = subprocess.run(" ".join(step2_cmd), universal_newlines=True, shell=True)
+	step1_run = subprocess.run(step1_cmd)
+	step2_run = subprocess.run(step2_cmd)
