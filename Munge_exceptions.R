@@ -13,14 +13,19 @@
 ###### 
 ##################################
 
+# I ended up getting rid of the flip_list and opting for only negating since flipping alleles screwed with PRS-CS PGS construction.
+# As such, cesSmoke is no longer a munge exception as I was flipping alleles and negating beta before but am instead leaving it be. 
 
 flip_list <- c(
   # Liu et al. 2019, alleles must be flipped because beta reported corresponds to alternate rather than reference allele
-  'drinkWeek','maxCPD', 'cesSmoke', 'ageSmoke', 'smokeInit', 'dpw')
+  #'drinkWeek','maxCPD', 'cesSmoke', 'ageSmoke', 'smokeInit', 'dpw'
+  )
 negate_list <- c(
   # Smoking cessation was defined as 2 for current smokers and 1 for former smokers, the directional opposite of our
-  # phenotypic measure, which codes current smokers as 0 and former smokers as 1
-  'cesSmoke', 'cancerBreast', 'memoryTest')
+  # phenotypic measure, which codes current smokers as 0 and former smokers as 1, so we leave it alone
+  'drinkWeek','maxCPD', 'ageSmoke', 'smokeInit', 'dpw', # added these to negate_list instead because flipping alleles doesn't work with PRS-cs
+  'cancerBreast', 'memoryTest'
+  )
 master_list <-  c(flip_list, negate_list)
 
 # Read inputted trait's munged sumstat, perform additional operations required for exception, then overwrite sumstat file
