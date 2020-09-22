@@ -1,0 +1,26 @@
+Start time: Tue Sep 22 14:11:34 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr1.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr1_v3.bgen \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_phenos.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr1
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr1_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 7402791 variants.
