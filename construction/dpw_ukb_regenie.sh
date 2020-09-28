@@ -3,7 +3,7 @@
  # /home/ubuntu/tools/regenie/regenie \
  # 	--step 1 \
  # 	--bed ~/UKB/genomeclean/ukb_non_imputed_best_guess_QC \
-	# --covarFile ~/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  # --covarFile ~/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
  # 	--phenoFile ~/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_phenos.txt \
  # 	--bsize 1000 \
 	# --lowmem ~/biroli/geighei/data/GWAS_sumstats/construction/tmpdir/regenie_tmp_preds \
@@ -15,6 +15,7 @@ do
 	regenie \
 	--step 2 \
 	--bgen ~/UKB/imputed/ukb_imp_chr${i}_v3.bgen \
+	--sample ~/UKB/genomeraw/ukb41382_imp_chr${i}_v3_s487330.sample \
 	--covarFile ~/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
 	--phenoFile ~/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_phenos.txt \
 	--firth 0.01 --approx \
