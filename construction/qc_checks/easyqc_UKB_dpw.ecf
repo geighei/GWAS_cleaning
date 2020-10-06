@@ -2,6 +2,7 @@
 ##### EasyQC-script to perform study-level and meta-level QC on imputed 1000G data
 ##### EasyQC version: 9.0
 ##### Programmer: Thomas Winkler, 2014-09-22
+##### Last edited by: Jeremy Vollen, 2020-09-28
 ##### Contact: thomas.winkler@klinik.uni-regensburg.de
 #################################################################################################################
 
@@ -9,12 +10,12 @@
 ## PLEASE MAKE SURE THAT ALL INSTANCES OF "FILL _ IN" and "SDY _ FILL" ARE FIXED ##
 
 ### Please DEFINE here format and input columns of the following EASYIN files
-DEFINE		--pathOut /lustre5/0/Galama/andriesm/GWAS_PIPELINE/OUTPUT/POST_EASYQC
+DEFINE	--pathOut /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/easyqc
 		--strMissing NA
-		--strSeparator TAB
-		--acolIn rsID;coded_all;noncoded_all;Chr;position;N;Beta;SE;Pval;AF_coded_all;imputed;oevar_imp;HWE_pval
+		--strSeparator WHITESPACE
+		--acolIn ID;ALLELE0;ALLELE1;CHROM;GENPOS;N;BETA;SE;LOG10P;A1FREQ;INFO
 		#--acolInClasses character;character;character;character;character;numeric;numeric;numeric;numeric;numeric;numeric;numeric;numeric
-		--acolNewName SNP;EFFECT_ALLELE;OTHER_ALLELE;CHR;BP;N;BETA;SE;PVAL;EAF;IMPUTED;IMPUTATION;HWE
+		--acolNewName SNP;EFFECT_ALLELE;OTHER_ALLELE;CHR;BP;N;BETA;SE;LOG10P;AAF;IMPUTATION
 
 ## Please DO NOT CHANGE --acolNewName values because these reflect the column names used throughout the script
 ## If the study used different column names, please amend the respective value at --acolIn, the column will then
@@ -23,7 +24,8 @@ DEFINE		--pathOut /lustre5/0/Galama/andriesm/GWAS_PIPELINE/OUTPUT/POST_EASYQC
 ### Please define here the input files of the study:
 
 ### Falls outside loop, issue? Richard constructs many of these files...solve
-EASYIN	--fileIn /lustre5/0/Galama/andriesm/GWAS_PIPELINE/OUTPUT/BOLT_OUTPUT/PRE_EASYQC_rgses_UKB/GWAS.UKB.Intel.avg.resid_full.association-results.1_22.txt --fileInShortName intel_full --astrSetNumCol MAF_THRESHOLD=0.005;INFO_THRESHOLD=0.9;SDY=6.3
+
+EASYIN	--fileIn /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/dpw/ukb_dpw_full.txt --fileInShortName dpw_full --astrSetNumCol MAF_THRESHOLD=0.005;INFO_THRESHOLD=0.9;SDY=6.3
 
 ##############################################################
 ## 0. Start EasyQC scripting interface                      ##
@@ -34,6 +36,16 @@ START EASYQC
 ##############################################################
 ## 1. Sanity checks                                         ##
 ##############################################################
+
+## JV: calculate necessary columns which weren't part of original GWAS output
+	# JV: data is mostly imputed. label those with INFO == 1 as IMPUTED = 0; 
+ADDCOL --rcdAddCol ifelse(IMPUTATION==1, 0, 1) --colOut IMPUTED
+	# JV: mutate P from -log10p to p (10^-log10p)
+ADDCOL --rcdAddCol 10^(-LOG10P) --colOut PVAL
+	# JV: EAF = 1 - AltAlleleFreq if AltAlleleFreq > 0.5, AltAlleleFreq o/w; https://www.biostars.org/p/422074/#460654
+ADDCOL --rcdAddCol 1-AAF --colOut EAF
+	# JV: we don't have HWE p-values - generate as NA
+ADDCOL --rcdAddCol NA --colOut HWE
 
 ## Filtering  SNPs with missing values
 CLEAN --rcdClean !(EFFECT_ALLELE%in%c('A','C','G','T')) --strCleanName numDrop_invalid_EA --blnWriteCleaned 0
@@ -104,7 +116,7 @@ CREATECPTID
 		--colInA2 OTHER_ALLELE
 		--colInChr CHR
 		--colInPos BP
-		--fileMap /lustre5/0/Galama/andriesm/GWAS_PIPELINE/Reference/HPC/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.rsid_map
+		--fileMap /home/ubuntu/dep/rsid_map/HRC/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.rsid_map
 		--colMapMarker rsid
 		--colMapChr chr
 		--colMapPos pos
@@ -139,319 +151,7 @@ CLEANDUPLICATES	--colInMarker cptid
 # do I have access to the mapfile?
 ## Merge with file containing AFs for 1kG
 MERGE 		--colInMarker cptid
-		--fileRef /lustre5/0/Galama/andriesm/GWAS_PIPELINE/Reference/HPC/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.cptid.maf001
-		--acolIn cptid;ref;alt;raf
-		--acolInClasses character;character;character;numeric
-		--strRefSuffix .ref
-		--colRefMarker cptid
-		--blnWriteNotInRef 1
-		--blnInAll 0
-		--blnRefAll 0
-
-## Create column with expected allele frequency, given imputation ref. sample
-ADDCOL --rcdAddCol raf.ref --colOut EAF.ref
-
-## Adjust alleles to all be on the forward strand and to match the reference sample
-## (this automatically adjust EAF s.t. the frequency corresponds to A1 in the reference sample)
-## All mismatches will be removed (e.g. A/T in input, A/C in reference)
-ADJUSTALLELES
-			--colInA1 EFFECT_ALLELE
-			--colInA2 OTHER_ALLELE
-			--colInFreq EAF
-			--colInBeta BETA
-			--colRefA1 ref.ref
-			--colRefA2 alt.ref
-			--blnRemoveMismatch 1
-			--blnRemoveInvalid 1
-			--blnWriteInvalid 1
-
-## Compute difference expected and observed allele frequency
-ADDCOL --rcdAddCol abs(EAF-EAF.ref) --colOut DAF
-
-## Compare allele frequencies to those in the reference sample
-## blnPlotAll 0 causes that only outlying SNPs with |Freq-Freq.ref|>0.2 will be plotted (way less computational time)
-AFCHECK 	--colInFreq EAF
-		--colRefFreq EAF.ref
-		--numLimOutlier 0.2
-		--blnPlotAll 0
-		--blnRemoveOutlier 1
-
-
-##############################################################
-## 6. Compute Pval(Z) and filter on |reported P - Pval(Z)|   #
-##############################################################
-
-## Create column with Z-scores
-ADDCOL --rcdAddCol BETA/SE --colOut Z
-
-## Compute P-values based on Z-scores and the difference of the log p-values
-ADDCOL --rcdAddCol 2*pnorm(-abs(Z)) --colOut PVALZ
-ADDCOL --rcdAddCol abs(log10(PVAL)-log10(PVALZ)) --colOut DLP
-
-##############################################################
-## 7. Approximate expected SE and plot versus reported SE   ##
-##############################################################
-
-## Compute expected SEs if phenotype standardized and not standardized
-ADDCOL --rcdAddCol 1/sqrt(2*N*EAF*(1-EAF)) --colOut SE_EXPECT_PHEN_STD
-ADDCOL --rcdAddCol SDY/sqrt(2*N*EAF*(1-EAF)) --colOut SE_EXPECT
-ADDCOL --rcdAddCol sample(length(SE)) --colOut PERMUTATION
-ADDCOL --rcdAddCol SE_EXPECT_PHEN_STD[PERMUTATION] --colOut SE_EXPECT_PHEN_STD_PERMUTED
-ADDCOL --rcdAddCol SE_EXPECT[PERMUTATION] --colOut SE_EXPECT_PERMUTED
-ADDCOL --rcdAddCol SE[PERMUTATION] --colOut SE_PERMUTED
-
-# Concatenate the expected SE and the expected SE assuming the phenotype has been standardized
-# Ensure that the SEs for which standardization has been assumed are printed black
-# The counterpart (Y-axis) are the reported SEs
-SPLOT  	--rcdSPlotX c(SE_EXPECT_PERMUTED[1:min(50000,length(SE))],SE_EXPECT_PHEN_STD_PERMUTED[1:min(50000,length(SE))])
-              --rcdSPlotY c(SE_PERMUTED[1:min(50000,length(SE))],SE_PERMUTED[1:min(50000,length(SE))])
-		--strDefaultColour red
-		--arcdColourCrit (c(rep(0,min(50000,length(SE))),rep(1,min(50000,length(SE))))==1)
-		--astrColour black
-		--arcdAdd2Plot abline(0,1,col='orange')
-              --strXlab EXPECTED SE
-              --strYlab REPORTED SE
-		--strAxes zeroequal
-		--strPlotName SE-PLOT
-		--strMode subplot
-
-## Compute the expected SD(Y) and the input/reported SD(Y)
-CALCULATE --rcdCalc mean(SE*sqrt(2*N*EAF*(1-EAF))) --strCalcName expSDY
-CALCULATE --rcdCalc mean(SDY) --strCalcName repSDY
-
-
-##############################################################
-## 8. Rearrange columns and Write CLEANED output            ##
-##############################################################
-
-##Split created Chr and BP columns after removal of duplicates etc.
-STRSPLITCOL --colSplit cptid
-	--strSplit :
-	--numSplitIdx 1
-	--colOut Chr
-
-STRSPLITCOL --colSplit cptid
-		--strSplit :
-		--numSplitIdx 2
-		--colOut position
-
-## Retain only columns relevant for exporting cleaned file
-GETCOLS --acolOut SNP;cptid;Chr;position;EFFECT_ALLELE;OTHER_ALLELE;EAF;IMPUTED;IMPUTATION;BETA;SE;Z;PVAL;N;HWE
-
-## Write cleaned file
-WRITE	--strPrefix CLEANED.
-	--strMissing NA
-	--strMode gz
-
-
-##############################################################
-## 9. Plot Pval(Z) versus reported P                        ##
-##############################################################
-
-PZPLOT	--colBeta BETA
-	--colSe SE
-	--colPval PVAL
-
-
-##############################################################
-## 10. Generate QQ plot                                     ##
-##############################################################
-
-QQPLOT	--acolQQPlot PVAL
-	--numPvalOffset 0.05
-	--strMode subplot
-
-
-##############################################################
-## 11. Generate GC PLOT                                     ##
-##############################################################
-
-CALCULATE --rcdCalc max(N,na.rm=T) --strCalcName N_max
-GC	--colPval PVAL --blnSuppressCorrection 1
-
-RPLOT	--rcdRPlotX N_max
-	--rcdRPlotY Lambda.PVAL.GC
-	--arcdAdd2Plot abline(h=1,col='orange');abline(h=1.1,col='red')
-	--strAxes lim(0,NULL,0,NULL)
-	--strPlotName GC-PLOT
-
-
-##############################################################
-## 12. Generate SE-N Plot                                   ##
-##############################################################
-
-CALCULATE --rcdCalc median(SE,na.rm=T) --strCalcName SEmedian
-CALCULATE --rcdCalc median(1/sqrt(2*EAF*(1-EAF)), na.rm=T) --strCalcName c_trait_transf
-
-RPLOT 	--rcdRPlotX sqrt(N_max)
-	--rcdRPlotY c_trait_transf/SEmedian
-	--arcdAdd2Plot abline(0,1,col='orange')
-	--strAxes zeroequal
-	--strPlotName SEN-PLOT
-
-
-##############################################################
-## 13. Calculate Descriptive statistics                     ##
-##############################################################
-
-## Get number of SNPs with large Beta and SE.
-GETNUM --rcdGetNum SE>=5 --strGetNumName num_SEget5
-GETNUM --rcdGetNum abs(BETA)>=5 --strGetNumName num_absBETAget5
-
-## Get descriptives for BETA, SE, PVAL, and IMPUTATION
-EVALSTAT	--colStat BETA
-		--strTag Stat
-EVALSTAT	--colStat SE
-		--strTag Stat
-EVALSTAT	--colStat PVAL
-		--strTag Stat
-EVALSTAT      --colStat IMPUTATION
-              --strTag Stat.PostQC
-
-
-STOP EASYQC
-#################################################################################################################
-##### EasyQC-script to perform study-level and meta-level QC on imputed 1000G data
-##### EasyQC version: 9.0
-##### Programmer: Thomas Winkler, 2014-09-22
-##### Contact: thomas.winkler@klinik.uni-regensburg.de
-#################################################################################################################
-
-
-## PLEASE MAKE SURE THAT ALL INSTANCES OF "FILL _ IN" and "SDY _ FILL" ARE FIXED ##
-
-### Please DEFINE here format and input columns of the following EASYIN files
-DEFINE		--pathOut /lustre5/0/Galama/andriesm/GWAS_PIPELINE/OUTPUT/POST_EASYQC
-		--strMissing NA
-		--strSeparator TAB
-		--acolIn rsID;coded_all;noncoded_all;Chr;position;N;Beta;SE;Pval;AF_coded_all;imputed;oevar_imp;HWE_pval
-		#--acolInClasses character;character;character;character;character;numeric;numeric;numeric;numeric;numeric;numeric;numeric;numeric
-		--acolNewName SNP;EFFECT_ALLELE;OTHER_ALLELE;CHR;BP;N;BETA;SE;PVAL;EAF;IMPUTED;IMPUTATION;HWE
-
-## Please DO NOT CHANGE --acolNewName values because these reflect the column names used throughout the script
-## If the study used different column names, please amend the respective value at --acolIn, the column will then
-## be automatically renamed to the respective --acolNewName value
-
-### Please define here the input files of the study:
-
-### is this within the loop for say 3 pheno's? Ah, I have to make an .ecf file for each pheno, say: full_sample, splitA, and splitB. Which can be identical, besides input and output
-EASYIN	--fileIn /lustre5/0/Galama/andriesm/GWAS_PIPELINE/OUTPUT/BOLT_OUTPUT/PRE_EASYQC_rgses_UKB/GWAS.UKB.EA.avg.resid_62.5_sample.association-results.1_22.txt --fileInShortName EA_62.5 --astrSetNumCol MAF_THRESHOLD=0.005;INFO_THRESHOLD=0.9;SDY=6.3
-
-##############################################################
-## 0. Start EasyQC scripting interface                      ##
-##############################################################
-
-START EASYQC
-
-##############################################################
-## 1. Sanity checks                                         ##
-##############################################################
-
-## Filtering  SNPs with missing values
-CLEAN --rcdClean !(EFFECT_ALLELE%in%c('A','C','G','T')) --strCleanName numDrop_invalid_EA --blnWriteCleaned 0
-CLEAN --rcdClean !(OTHER_ALLELE%in%c('A','C','G','T')) --strCleanName numDrop_invalid_OA --blnWriteCleaned 0
-CLEAN --rcdClean is.na(SNP) --strCleanName numDrop_Missing_SNP --blnWriteCleaned 0
-CLEAN --rcdClean is.na(EFFECT_ALLELE)&is.na(OTHER_ALLELE) --strCleanName numDrop_Missing_Both_Alleles --blnWriteCleaned 0
-CLEAN --rcdClean is.na(PVAL) --strCleanName numDrop_Missing_P --blnWriteCleaned 0
-CLEAN --rcdClean is.na(BETA) --strCleanName numDrop_Missing_BETA --blnWriteCleaned 0
-CLEAN --rcdClean is.na(SE) --strCleanName numDrop_Missing_SE --blnWriteCleaned 0
-CLEAN --rcdClean is.na(EAF) --strCleanName numDrop_Missing_EAF --blnWriteCleaned 0
-CLEAN --rcdClean is.na(N) --strCleanName numDrop_Missing_N --blnWriteCleaned 0
-CLEAN --rcdClean is.na(IMPUTED) --strCleanName numDrop_Missing_IMPUTED --blnWriteCleaned 0
-CLEAN	--rcdClean IMPUTED==1 & is.na(IMPUTATION) --strCleanName numDrop_Imputed_Missing_INFO --blnWriteCleaned 0
-
-
-## Filtering  SNPs with nonsense values
-CLEAN --rcdClean PVAL<0|PVAL>1 --strCleanName numDrop_invalid_PVAL --blnWriteCleaned 0
-CLEAN --rcdClean SE<=0|SE==Inf --strCleanName numDrop_invalid_SE --blnWriteCleaned 0
-CLEAN --rcdClean abs(BETA)==Inf --strCleanName numDrop_invalid_BETA --blnWriteCleaned 0
-CLEAN --rcdClean EAF<0|EAF>1 --strCleanName numDrop_invalid_EAF --blnWriteCleaned 0
-CLEAN --rcdClean N<=0 --strCleanName numDrop_invalid_N --blnWriteCleaned 0
-CLEAN --rcdClean IMPUTATION<0 & is.na(IMPUTATION)==0 --strCleanName numDrop_invalid_IMPUTATION --blnWriteCleaned 0
-CLEAN --rcdClean IMPUTED!=0 & IMPUTED!=1 & is.na(IMPUTED)==0 --strCleanName numDrop_invalid_IMPUTED --blnWriteCleaned 0
-
-## Calculate descriptives for imputation quality prior to QC
-EVALSTAT    --colStat IMPUTATION
-            --strTag Stat.PreQC
-
-##############################################################
-## 2. Main QC: apply general and cohort-specific thresholds ##
-##############################################################
-
-## Exclude monomorphic SNPs:
-CLEAN --rcdClean (EAF==0)|(EAF==1) --strCleanName numDrop_Monomorphic --blnWriteCleaned 0
-
-## MAF
-CLEAN --rcdClean (EAF<MAF_THRESHOLD)|(EAF>(1-MAF_THRESHOLD)) --strCleanName numDrop_MAF --blnWriteCleaned 0
-CALCULATE --rcdCalc mean(MAF_THRESHOLD) --strCalcName MAF_threshold
-
-## Print the number of SNPs that has been imputed, genotyped, and used for imputation
-GETNUM --rcdGetNum IMPUTED==1 --strGetNumName num_Imputed
-GETNUM --rcdGetNum IMPUTED==0 --strGetNumName num_Genotyped
-GETNUM --rcdGetNum is.na(IMPUTED) --strGetNumName num_ImputedNA
-
-## IMPUTATION QUALITY: DO NOT FILTER ON IMPUTATION QUALITY IN CASE THE SNP HAS NOT BEEN IMPUTED (i.e., IMPUTED!=0 (does not work properly) USE: IMPUTED==1 or NA)
-CLEAN --rcdClean is.na(IMPUTATION) & (IMPUTED==1 | is.na(IMPUTED)) --strCleanName numDrop_Imputed_ImpQual_Missing --blnWriteCleaned 0
-CLEAN --rcdClean IMPUTATION<INFO_THRESHOLD & IMPUTED==1 --strCleanName numDrop_Imputed_ImpQual --blnWriteCleaned 0
-CALCULATE --rcdCalc mean(INFO_THRESHOLD) --strCalcName ImpQual_threshold
-
-## HWE: FILTER ONLY IF HWE INFO IS AVAILABLE AND THE MARKER IS KNOWN TO HAVE BEEN GENOTYPED
-CLEAN --rcdClean HWE<=0.001 & is.na(HWE)==0 & N<1000 & IMPUTED==0 --strCleanName numDrop_Genotyped_HWElet1EM3 --blnWriteCleaned 0
-CLEAN --rcdClean HWE<=0.0001 & is.na(HWE)==0 & N>=1000 & N<2000 & IMPUTED==0 --strCleanName numDrop_Genotyped_HWElet1EM4 --blnWriteCleaned 0
-CLEAN --rcdClean HWE<=0.00001 & is.na(HWE)==0 & N>=2000 & N<10000 & IMPUTED==0 --strCleanName numDrop_Genotyped_HWElet1EM5 --blnWriteCleaned 0
-
-## Filter on SEs that are 40% greater than the SE one would expect when MAF=0.5% and SDY
-CLEAN --rcdClean SE>= 1.4*SDY/sqrt(2*N*MAF_THRESHOLD*(1-MAF_THRESHOLD)) --strCleanName numDrop_SEget40overSqrtN --blnWriteCleaned 1
-
-## LPM (OLS) filter on BETAs that would correspond to an Rsq > 5%
-#CLEAN --rcdClean  abs(BETA) > 0.255665247*(1-0.255665247)*(sqrt(0.05)/sqrt(2*EAF*(1-EAF))) --strCleanName numDrop_LPMRsq5 --blnWriteCleaned 1
-
-## Filter on BETAs that would correspond to an Rsq > 5% given SD(Y)=SDY ####!!!! ONLY USE IF NOT LOGISTIC NOR LPM !!!!####
-CLEAN --rcdClean abs(BETA)>((sqrt(0.05)*SDY)/sqrt(2*EAF*(1-EAF))) --strCleanName numDrop_OLSRsq5 --blnWriteCleaned 1
-
-##Add cptid column
-CREATECPTID
-		--colInMarker SNP
-		--colInA1 EFFECT_ALLELE
-		--colInA2 OTHER_ALLELE
-		--colInChr CHR
-		--colInPos BP
-		--fileMap /lustre5/0/Galama/andriesm/GWAS_PIPELINE/Reference/HPC/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.rsid_map
-		--colMapMarker rsid
-		--colMapChr chr
-		--colMapPos pos
-		--blnUseInMarker 1
-
-##############################################################
-## 3. Harmonization of allele coding (I/D)                  ##
-##############################################################
-
-## Aim: compile uniform allele codes A/C/G/T or I/D from different versions
-HARMONIZEALLELES 	--colInA1 EFFECT_ALLELE
-			--colInA2 OTHER_ALLELE
-
-
-##############################################################
-## 4.Filter duplicate SNPs                                  ##
-##############################################################
-
-## Aim: For duplicate SNPs keep only the duplicate with highest N
-
-CLEANDUPLICATES	--colInMarker cptid
-			--strMode removeall
-			--colN N
-
-## Dropped duplicates written to "*duplicates.txt"
-
-
-##############################################################
-## 5. AF Checks                                             ##
-##############################################################
-
-# do I have access to the mapfile?
-## Merge with file containing AFs for 1kG
-MERGE 		--colInMarker cptid
-		--fileRef /lustre5/0/Galama/andriesm/GWAS_PIPELINE/Reference/HPC/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.cptid.maf001
+		--fileRef /home/ubuntu/dep/rsid_map/HRC/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.cptid.maf001
 		--acolIn cptid;ref;alt;raf
 		--acolInClasses character;character;character;numeric
 		--strRefSuffix .ref
