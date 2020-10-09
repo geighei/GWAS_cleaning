@@ -32,7 +32,24 @@ ukb_cols = ["eid", 		# Individual ID
 			"2867",		# Age started smoking
 			"21001",	# Body Mass Index (BMI)
 			"20116",	# Smoking cessation
-			"41204"]	# Type II Diabetes
+			"41204",	# Type II Diabetes
+			"20018",	# Prospective memory test 
+			"6150",		# High blood pressure
+			"137",		# Treatments / medications taken 
+			"2020",		# Loneliness 
+			"20116",	# Smoke Initiation
+			"20126",	# Unipolar Depression
+			"1200",		# Insomnia symptoms
+  			"20002", 	# Arthritis 
+  			"135",		# Non-cancer illnesses 
+  			"20421",	# Anxiety 
+  			"50",		# Height 
+ 			"22127",	# Asthma 
+ 			"20127",	# Neuroticism Score 
+			"2000",		# Feeling Worry
+			"904",		# Physical activity 
+			"884"		# Physical activity
+]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
 ukb_iterator = pd.read_csv("/home/ubuntu/biroli/ukb/ukb23283.csv.gz", engine="python", encoding = "ISO-8859-1",
@@ -49,7 +66,7 @@ ukb = ukb[ukb["22006-0.0"] == 1]
 ukb.insert(0, "IID", ukb.eid)
 ukb.insert(0, "FID", ukb.eid)
 # covariates are gender, year of birth, and first 20 principal components
-covar_cols = [col for col in ukb.columns if re.search("FID|IID|31-0\.0|34-0\.0|22009-0\.([1-9]$|1[0-9]|20)", col)]
+covar_cols = [col for col in ukb.columns if re.search("^(FID|IID|31-0\.0|34-0\.0|22009-0\.([1-9]$|1[0-9]|20))", col)]
 
 # DRINKS PER WEEK
 # construction taken from biroli/ukb/alcohol/alcohol_panel_construction/reshape_ukb.R
@@ -157,6 +174,127 @@ ukb[t2d_cols] = ukb[t2d_cols].applymap(lambda x: t2d_dict.get(x, 0))
 ukb["t2d"] = ukb[t2d_cols].max(axis=1)
 t2d = ukb.dropna(subset=["t2d"])[["FID", "IID", "t2d"]]
 
+# PROSPECTIVE MEMORY TEST
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20018
+memoryTest_dict = {0: 0, 1: 2, 2: 1}
+memoryTest_cols = [col for col in ukb.columns if re.search("^20018-", col)]
+ukb[memoryTest_cols] = ukb[memoryTest_cols].applymap(lambda x: memoryTest_dict.get(x))
+# use average value across individuals 
+ukb["memoryTest"] = ukb[memoryTest_cols].mean(axis=1)
+memoryTest = ukb.dropna(subset=["memoryTest"])[["FID", "IID", "memoryTest"]]
+
+# HIGH BLOOD PRESSURE
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
+highBloodPressure_dict = { 1: 0, 2: 0, 3: 0, -3: np.nan, -7: 0}
+highBloodPressure_cols = [col for col in ukb.columns if re.search("^6150-", col)]
+ukb[highBloodPressure_cols] = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x))
+# use maximum to maintain consistency across individuals since it's binary
+ukb["highBloodPressure"] = ukb[highBloodPressure_cols].max(axis=1)
+highBloodPressure = ukb.dropna(subset=["highBloodPressure"])[["FID", "IID", "highBloodPressure"]]
+
+# TREATMENTS / MADICATIONS TAKEN 
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=137
+medsTaken_cols = [col for col in ukb.columns if re.search("^137-", col)]
+# use average value across individuals 
+ukb["medsTaken"] = ukb[medsTaken_cols].mean(axis=1)
+medsTaken = ukb.dropna(subset=["medsTaken"])[["FID", "IID", "medsTaken"]]
+
+# LONELINESS
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2020 
+loneliness_dict = {-1: np.nan, -3: np.nan}
+loneliness_cols = [col for col in ukb.columns if re.search("^2020-", col)]
+ukb[loneliness_cols] = ukb[loneliness_cols].applymap(lambda x: loneliness_dict.get(x))
+# use first available observation as there shouldn't be inconsistencies
+ukb["loneliness"] = ukb[loneliness_cols].bfill(axis=1).iloc[:,0]
+loneliness = ukb.dropna(subset=["loneliness"])[["FID", "IID", "loneliness"]]
+
+# SMOKE INITIATION
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20116
+smokeInit_dict = {-3: np.nan, 2: 1}
+smokeInit_cols = [col for col in ukb.columns if re.search("^20116-", col)]
+ukb[smokeInit_cols] = ukb[smokeInit_cols].applymap(lambda x: smokeInit_dict.get(x))
+# use last available observation as there shouldn't be inconsistencies
+ukb["smokeInit"] = ukb[smokeInit_cols].ffill(axis=1).iloc[:,0]
+smokeInit = ukb.dropna(subset=["smokeInit"])[["FID", "IID", "smokeInit"]]
+
+# UNIPOLAR DEPRESSION
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20126
+depress_dict = { 0: 0 ,  1: 0 ,  2: 0 , 3: 1,  4: 1, 5: 1 }
+depress_cols = [col for col in ukb.columns if re.search("^20126-", col)]
+ukb[depress_cols] = ukb[depress_cols].applymap(lambda x: depress_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["depress"] = ukb[depress_cols].max(axis=1).iloc[:,0]
+depress = ukb.dropna(subset=["depress"])[["FID", "IID", "depress"]]
+
+# INSOMNIA SYMPTOMS
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=1200
+insomniaFrequent_dict = {-3: np.nan}
+insomniaFrequent_cols = [col for col in ukb.columns if re.search("^1200-", col)]
+ukb[insomniaFrequent_cols] = ukb[insomniaFrequent_cols].applymap(lambda x: insomniaFrequent_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["insomniaFrequent"] = ukb[insomniaFrequent_cols].max(axis=1).iloc[:,0]
+insomniaFrequent = ukb.dropna(subset=["insomniaFrequent"])[["FID", "IID", "insomniaFrequent"]]
+
+# ARTHRITIS 
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20002
+arthritis_dict = {99999: np.nan, 1465: 1}
+arthritis_cols = [col for col in ukb.columns if re.search("^20002-", col)]
+ukb[arthritis_cols] = ukb[arthritis_cols].applymap(lambda x: arthritis_dict.get(x, x))
+# use fist available observation as there shouldn't be inconsistencies
+ukb["arthritis"] = ukb[arthritis_cols].bfill(axis=1).iloc[:,0]
+arthritis = ukb.dropna(subset=["arthritis"])[["FID", "IID", "arthritis"]]
+
+# NON-CANCER ILNESSES
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=135
+nonCancerIllness_cols = [col for col in ukb.columns if re.search("^135-", col)]
+# use max observation as there shouldn't be inconsistencies
+ukb["nonCancerIllness"] = ukb[nonCancerIllness_cols].max(axis=1).iloc[:,0]
+nonCancerIllness_cols = ukb.dropna(subset=["nonCancerIllness"])[["FID", "IID", "nonCancerIllness"]]
+
+# ANXIETY
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20421
+anxiety_dict = {-818: np.nan, -121: np.nan}
+anxiety_cols = [col for col in ukb.columns if re.search("^20421-", col)]
+ukb[anxiety_cols] = ukb[anxiety_cols].applymap(lambda x: anxiety_dict.get(x))
+# use fist available observation as there shouldn't be inconsistencies
+ukb["anxiety"] = ukb[anxiety_cols].bfill(axis=1).iloc[:,0]
+anxiety = ukb.dropna(subset=["anxiety"])[["FID", "IID", "anxiety"]]
+
+# HEIGHT
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=50
+height_cols = [col for col in ukb.columns if re.search("^135-", col)]
+# use max observation as there shouldn't be inconsistencies
+ukb["height"] = ukb[height_cols].max(axis=1).iloc[:,0]
+height = ukb.dropna(subset=["height"])[["FID", "IID", "height"]]
+
+# ASTHMA
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=22127
+asthma_cols = [col for col in ukb.columns if re.search("^22127-", col)]
+# use max observation as there shouldn't be inconsistencies
+ukb["asthma"] = ukb[asthma_cols].max(axis=1).iloc[:,0]
+asthma = ukb.dropna(subset=["asthma"])[["FID", "IID", "asthma"]]
+
+# NEUROTICISM SCORE
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20127
+neuroticismScore_cols = [col for col in ukb.columns if re.search("^20127-", col)]
+# use max observation as there shouldn't be inconsistencies
+ukb["neuroticismScore"] = ukb[neuroticismScore_cols].max(axis=1).iloc[:,0]
+neuroticismScore = ukb.dropna(subset=["neuroticismScore"])[["FID", "IID", "neuroticismScore"]]
+
+# FEELING WORRY
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2000
+worryFeeling_dict = {-1: np.nan, -3: np.nan}
+worryFeeling_cols = [col for col in ukb.columns if re.search("^2000-", col)]
+ukb[worryFeeling_cols] = ukb[worryFeeling_cols].applymap(lambda x: worryFeeling_dict.get(x))
+# use fist available observation as there shouldn't be inconsistencies
+ukb["worryFeeling"] = ukb[worryFeeling_cols].max(axis=1).iloc[:,0]
+worryFeeling = ukb.dropna(subset=["worryFeeling"])[["FID", "IID", "worryFeeling"]]
+
+# PHYSICAL ACTIVITY
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=904
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=884
+actModVig_cols = [col for col in ukb.columns if re.search("^884-", col)]
+
 # write data
 ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
 dpw.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw_pheno.txt", sep="\t", index=False, na_rep="NA")
@@ -169,5 +307,17 @@ smokeInit.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/sm
 bmi.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/bmi_pheno.txt", sep="\t", index=False, na_rep="NA")
 cesSmoke.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cesSmoke_pheno.txt", sep="\t", index=False, na_rep="NA")
 t2d.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/t2d_pheno.txt", sep="\t", index=False, na_rep="NA")
-
-
+memoryTest.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/memoryTest_pheno.txt", sep="\t", index=False, na_rep="NA")
+highBloodPressure.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/highBloodPressure_pheno.txt", sep="\t", index=False, na_rep="NA")
+medsTaken.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/medsTaken_pheno.txt", sep="\t", index=False, na_rep="NA")
+loneliness.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/loneliness_pheno.txt", sep="\t", index=False, na_rep="NA")
+smokeInit.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/smokeInit_pheno.txt", sep="\t", index=False, na_rep="NA")
+depress.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/depress_pheno.txt", sep="\t", index=False, na_rep="NA")
+insomniaFrequent.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/insomniaFrequent_pheno.txt", sep="\t", index=False, na_rep="NA")
+arthritis.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/arthritis_pheno.txt", sep="\t", index=False, na_rep="NA")
+nonCancerIllness.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/nonCancerIllness_pheno.txt", sep="\t", index=False, na_rep="NA")
+anxiety.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/anxiety_pheno.txt", sep="\t", index=False, na_rep="NA")
+height.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/height_pheno.txt", sep="\t", index=False, na_rep="NA")
+asthma.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/asthma_pheno.txt", sep="\t", index=False, na_rep="NA")
+neuroticismScore.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/neuroticismScore_pheno.txt", sep="\t", index=False, na_rep="NA")
+worryFeeling.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/worryFeeling_pheno.txt", sep="\t", index=False, na_rep="NA")
