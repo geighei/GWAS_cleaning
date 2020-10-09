@@ -262,7 +262,7 @@ anxiety = ukb.dropna(subset=["anxiety"])[["FID", "IID", "anxiety"]]
 
 # HEIGHT
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=50
-height_cols = [col for col in ukb.columns if re.search("^135-", col)]
+height_cols = [col for col in ukb.columns if re.search("^50-", col)]
 # use max observation as there shouldn't be inconsistencies
 ukb["height"] = ukb[height_cols].max(axis=1).iloc[:,0]
 height = ukb.dropna(subset=["height"])[["FID", "IID", "height"]]
