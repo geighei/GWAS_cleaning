@@ -1,6 +1,12 @@
 # GWAS_cleaning
 All code involving the construction, cleaning, processing, standardizing, "munging", and meta-analysis of GWAS summary statistics.
 
+  ## munging
+  - Purpose: standardize/clean sumstats in bulk and write them to files with standardized naming conventions and locations
+  - Munge.R stores the 'munge' function, which reads a summary statistic, filters problematic observations, guesses and renames column titles, and writes file to output
+  - Munge_exceptions.R performs any common operations that are still required after munging. It isn't very dynamic. It has a list of phenotypes that need to have alleles or beta flipped and does so and overwrites cleaned sumstat files if called on those phenotypes.
+  - Clean_GWAS_Cmd.R is a program with command-line options which takes a spreadsheet with sumstat paths and pheno names and munges all phenotypes, writes the standardized versions to a new directory, and calles Munge_exceptions.R for any final touches
+
   ## meta_analysis
   - Purpose: codes to help automate meta-analysis of two or more GWAS summary statistics
   - meta23.py is a program with command-line options which automates the meta-analysis (using METAL) of a summary statistic with its 23&me cohort sumstat
