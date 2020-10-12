@@ -3,7 +3,10 @@
 construction="/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction"
 output="/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/dpw"
 
+
+
 # step 1 - took 5.25 hours on 16cpu-64ram machine; 14 hours on 8cpu-32ram machine
+# extract step: snp list for chr==1-23. added this after new error appeared related to other chr codes
 regenie \
 --step 1 \
 --bed ~/UKB/genomeclean/ukb_non_imputed_best_guess_QC \

@@ -1,0 +1,814 @@
+Start time: Fri Oct  9 15:10:47 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw.log
+
+Options in effect:
+  --step 1 \
+  --bed /home/ubuntu/UKB/genomeclean/ukb_non_imputed_best_guess_QC \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --bsize 1000 \
+  --lowmem \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw
+
+Fitting null model
+ * bim              : [/home/ubuntu/UKB/genomeclean/ukb_non_imputed_best_guess_QC.bim] ERROR: Unknown chromosome code in bim file at line 445255
+Start time: Fri Oct  9 15:10:48 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr1.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr1_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr1_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr1
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr1_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 7402791 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr1_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 15:45:17 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr2.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr2_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr2_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr2
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr2_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 8129063 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr2_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 16:20:57 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr3.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr3_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr3_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr3
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr3_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 6696680 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr3_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 16:50:35 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr4.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr4_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr4_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr4
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr4_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 6555871 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr4_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 17:21:06 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr5.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr5_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr5_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr5
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr5_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 6070641 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr5_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 17:47:53 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr6.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr6_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr6_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr6
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr6_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 5751712 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr6_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 18:15:11 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr7.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr7_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr7_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr7
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr7_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 5405524 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr7_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 18:40:36 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr8.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr8_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr8_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr8
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr8_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 5282223 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr8_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 19:03:56 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr9.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr9_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr9_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr9
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr9_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 4066774 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr9_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 19:23:41 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr10.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr10_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr10_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr10
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr10_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 4562904 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr10_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 19:45:11 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr11.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr11_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr11_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr11
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr11_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 4628348 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr11_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 20:06:02 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr12.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr12_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr12_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr12
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr12_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 4431052 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr12_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 20:26:57 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr13.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr13_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr13_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr13
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr13_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 3270217 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr13_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 20:42:24 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr14.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr14_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr14_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr14
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr14_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 3037521 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr14_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 20:57:03 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr15.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr15_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr15_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr15
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr15_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 2767971 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr15_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 21:10:43 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr16.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr16_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr16_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr16
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr16_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 3089612 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr16_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 21:25:23 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr17.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr17_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr17_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr17
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr17_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 2660711 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr17_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 21:38:13 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr18.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr18_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr18_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr18
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr18_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 2599579 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr18_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 21:50:22 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr19.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr19_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr19_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr19
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr19_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 2087017 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr19_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 22:01:25 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr20.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr20_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr20_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr20
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr20_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 2082571 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr20_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 22:11:10 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr21.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr21_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr21_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr21
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr21_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 1261158 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr21_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
+Start time: Fri Oct  9 22:18:06 2020
+
+              |==============================|
+              |        REGENIE v1.0.5.9      |
+              |==============================|
+
+Copyright (c) 2020 Joelle Mbatchou and Jonathan Marchini.
+Distributed under the MIT License.
+
+Log of output saved in file : /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr22.log
+
+Options in effect:
+  --step 2 \
+  --bgen /home/ubuntu/UKB/imputed/ukb_imp_chr22_v3.bgen \
+  --sample /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr22_v3_s487330.sample \
+  --covarFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt \
+  --phenoFile /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt \
+  --firth \
+  --approx \
+  --bsize 400 \
+  --pred /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list \
+  --split \
+  --out /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_chr22
+
+Association testing mode with multithreading using OpenMP
+ * bgen             : [/home/ubuntu/UKB/imputed/ukb_imp_chr22_v3.bgen]
+   -summary : bgen file (v1.2 layout, compressed) with 487409 anonymous samples and 1255683 variants.
+   -sample file: /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr22_v3_s487330.sample
+ * phenotypes       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt] n_pheno = 1
+   -dropping observations with missing values at any of the phenotypes
+   -number of phenotyped individuals = 289782
+   -number of individuals remaining with non-missing phenotypes = 289782
+ * covariates       : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt] n_cov = 22
+   -number of individuals with covariate data = 408905
+ * number of individuals used in analysis = 289782
+ * LOCO predictions : [/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/full/ukb_dpw_pred.list] ERROR : Number of files (0)  is not equal to the number of phenotypes.
