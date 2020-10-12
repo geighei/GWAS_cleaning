@@ -67,6 +67,7 @@ ukb.insert(0, "IID", ukb.eid)
 ukb.insert(0, "FID", ukb.eid)
 # covariates are gender, year of birth, and first 20 principal components
 covar_cols = [col for col in ukb.columns if re.search("^(FID|IID|31-0\.0|34-0\.0|22009-0\.([1-9]$|1[0-9]|20))", col)]
+ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
 
 # DRINKS PER WEEK
 # construction taken from biroli/ukb/alcohol/alcohol_panel_construction/reshape_ukb.R
