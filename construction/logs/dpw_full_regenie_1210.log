@@ -1766,4 +1766,15 @@ Chromosome 20
    -residualizing and scaling genotypes...done (14897ms) 
    -calc working matrices...done (9203ms) 
    -calc level 0 ridge...done (6316ms) 
- block [427] : 
+ block [427] : 1000 snps  (32101ms) 
+   -residualizing and scaling genotypes...done (12907ms) 
+   -calc working matrices...done (9038ms) 
+   -calc level 0 ridge...done (5881ms) 
+ block [428] : 1000 snps  (32019ms) 
+   -residualizing and scaling genotypes...done (13585ms) 
+   -calc working matrices...done (9059ms) 
+   -calc level 0 ridge...done (6715ms) 
+ block [429] : 1000 snps  (32687ms) 
+   -residualizing and scaling genotypes...done (14302ms) 
+   -calc working matrices...done (9061ms) 
+   -calc level 0 ridge...
