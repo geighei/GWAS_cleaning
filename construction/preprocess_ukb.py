@@ -47,8 +47,9 @@ ukb_cols = ["eid", 		# Individual ID
  			"22127",	# Asthma 
  			"20127",	# Neuroticism Score 
 			"2000",		# Feeling Worry
-			"904",		# Physical activity 
-			"884"		# Physical activity
+			"40006",	# Breast Cancer		
+			"30690",	# Cholesterol
+			"6150"		# Stroke
 ]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
@@ -223,7 +224,7 @@ depress_dict = { 0: 0 ,  1: 0 ,  2: 0 , 3: 1,  4: 1, 5: 1 }
 depress_cols = [col for col in ukb.columns if re.search("^20126-", col)]
 ukb[depress_cols] = ukb[depress_cols].applymap(lambda x: depress_dict.get(x))
 # use max observation as there shouldn't be inconsistencies
-ukb["depress"] = ukb[depress_cols].max(axis=1).iloc[:,0]
+ukb["depress"] = ukb[depress_cols].max(axis=1)
 depress = ukb.dropna(subset=["depress"])[["FID", "IID", "depress"]]
 
 # INSOMNIA SYMPTOMS
@@ -232,7 +233,7 @@ insomniaFrequent_dict = {-3: np.nan}
 insomniaFrequent_cols = [col for col in ukb.columns if re.search("^1200-", col)]
 ukb[insomniaFrequent_cols] = ukb[insomniaFrequent_cols].applymap(lambda x: insomniaFrequent_dict.get(x))
 # use max observation as there shouldn't be inconsistencies
-ukb["insomniaFrequent"] = ukb[insomniaFrequent_cols].max(axis=1).iloc[:,0]
+ukb["insomniaFrequent"] = ukb[insomniaFrequent_cols].max(axis=1)
 insomniaFrequent = ukb.dropna(subset=["insomniaFrequent"])[["FID", "IID", "insomniaFrequent"]]
 
 # ARTHRITIS 
@@ -248,7 +249,7 @@ arthritis = ukb.dropna(subset=["arthritis"])[["FID", "IID", "arthritis"]]
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=135
 nonCancerIllness_cols = [col for col in ukb.columns if re.search("^135-", col)]
 # use max observation as there shouldn't be inconsistencies
-ukb["nonCancerIllness"] = ukb[nonCancerIllness_cols].max(axis=1).iloc[:,0]
+ukb["nonCancerIllness"] = ukb[nonCancerIllness_cols].max(axis=1)
 nonCancerIllness_cols = ukb.dropna(subset=["nonCancerIllness"])[["FID", "IID", "nonCancerIllness"]]
 
 # ANXIETY
@@ -264,21 +265,21 @@ anxiety = ukb.dropna(subset=["anxiety"])[["FID", "IID", "anxiety"]]
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=50
 height_cols = [col for col in ukb.columns if re.search("^50-", col)]
 # use max observation as there shouldn't be inconsistencies
-ukb["height"] = ukb[height_cols].max(axis=1).iloc[:,0]
+ukb["height"] = ukb[height_cols].max(axis=1)
 height = ukb.dropna(subset=["height"])[["FID", "IID", "height"]]
 
 # ASTHMA
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=22127
 asthma_cols = [col for col in ukb.columns if re.search("^22127-", col)]
 # use max observation as there shouldn't be inconsistencies
-ukb["asthma"] = ukb[asthma_cols].max(axis=1).iloc[:,0]
+ukb["asthma"] = ukb[asthma_cols].max(axis=1)
 asthma = ukb.dropna(subset=["asthma"])[["FID", "IID", "asthma"]]
 
 # NEUROTICISM SCORE
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20127
 neuroticismScore_cols = [col for col in ukb.columns if re.search("^20127-", col)]
 # use max observation as there shouldn't be inconsistencies
-ukb["neuroticismScore"] = ukb[neuroticismScore_cols].max(axis=1).iloc[:,0]
+ukb["neuroticismScore"] = ukb[neuroticismScore_cols].max(axis=1)
 neuroticismScore = ukb.dropna(subset=["neuroticismScore"])[["FID", "IID", "neuroticismScore"]]
 
 # FEELING WORRY
@@ -287,13 +288,33 @@ worryFeeling_dict = {-1: np.nan, -3: np.nan}
 worryFeeling_cols = [col for col in ukb.columns if re.search("^2000-", col)]
 ukb[worryFeeling_cols] = ukb[worryFeeling_cols].applymap(lambda x: worryFeeling_dict.get(x))
 # use fist available observation as there shouldn't be inconsistencies
-ukb["worryFeeling"] = ukb[worryFeeling_cols].max(axis=1).iloc[:,0]
+ukb["worryFeeling"] = ukb[worryFeeling_cols].max(axis=1)
 worryFeeling = ukb.dropna(subset=["worryFeeling"])[["FID", "IID", "worryFeeling"]]
 
-# PHYSICAL ACTIVITY
-# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=904
-# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=884
-actModVig_cols = [col for col in ukb.columns if re.search("^884-", col)]
+# BREAST CANCER
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=40006
+cancerBreast_dict = {"C500": 1, "C501": 1, "C502": 1, "C503": 1, "C504": 1, "C505": 1, "C506": 1, "C507": 1, "C508": 1, "C509": 1}
+cancerBreast_cols = [col for col in ukb.columns if re.search("^40006-", col)]
+ukb[cancerBreast_cols] = ukb[cancerBreast_cols].applymap(lambda x: cancerBreast_dict.get(x, 0))
+# First available observation
+ukb["cancerBreast"] = ukb[cancerBreast_cols].bfill(axis=1).iloc[:,0]
+cancerBreast = ukb.dropna(subset=["cancerBreast"])[["FID", "IID", "cancerBreast"]]
+
+# CHOLESTEROL
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=30690
+totChol_cols = [col for col in ukb.columns if re.search("^30690-", col)]
+# use mean observation as there shouldn't be inconsistencies
+ukb["totChol"] = ukb[totChol_cols].mean(axis=1)
+totChol = ukb.dropna(subset=["totChol"])[["FID", "IID", "totChol"]]
+
+# STROKE
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
+stroke_dict = {1:0, 3:1}
+stroke_cols = [col for col in ukb.columns if re.search("^6150-", col)]
+ukb[stroke_cols] = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, 0))
+# use first available observation
+ukb["stroke"] = ukb[stroke_cols].bfill(axis=1).iloc[:,0]
+stroke = ukb.dropna(subset=["stroke"])[["FID", "IID", "stroke"]]
 
 # write data
 ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
@@ -321,3 +342,6 @@ height.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/heigh
 asthma.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/asthma_pheno.txt", sep="\t", index=False, na_rep="NA")
 neuroticismScore.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/neuroticismScore_pheno.txt", sep="\t", index=False, na_rep="NA")
 worryFeeling.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/worryFeeling_pheno.txt", sep="\t", index=False, na_rep="NA")
+cancerBreast.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancerBreast_pheno.txt", sep="\t", index=False, na_rep="NA")
+totChol.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/totChol_pheno.txt", sep="\t", index=False, na_rep="NA")
+stroke.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/stroke_pheno.txt", sep="\t", index=False, na_rep="NA")
