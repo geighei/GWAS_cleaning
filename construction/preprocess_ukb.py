@@ -54,6 +54,8 @@ ukb_cols = ["eid", 		# Individual ID
 			"41204",	# Severe Obesity
 			"2453",		# Cancer
 			"2040",		# Risk taking behaviour
+			"41270",	# Alzheimer's
+			"6148",		# Cataract
 ]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
@@ -331,7 +333,7 @@ ukb["childrenEverFathered"] = ukb[childrenEverFathered_cols].max(axis=1)
 childrenEverFathered = ukb.dropna(subset=["childrenEverFathered"])[["FID", "IID", "childrenEverFathered"]]
 
 # SEVERE OBESITY
-# Obesity Question: http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
 obesitySevere_dict = {"E660": 1, "E661": 1, "E662": 1, "E663": 1, "E664": 1, "E665": 1, "E666": 1, "E667": 1, "E668": 1, "E669": 1}
 obesitySevere_cols = [col for col in ukb.columns if re.search("^41204-", col)]
 ukb[obesitySevere_cols] = ukb[obesitySevere_cols].applymap(lambda x: obesitySevere_dict.get(x, 0))
@@ -356,6 +358,27 @@ ukb[risk_cols] = ukb[risk_cols].applymap(lambda x: risk_dict.get(x))
 # use max observation as there shouldn't be inconsistencies
 ukb["risk"] = ukb[risk_cols].max(axis=1)
 risk = ukb.dropna(subset=["risk"])[["FID", "IID", "risk"]]
+
+# ALZHEIMER'S
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41270
+alzheimer_dict = {"G300": 1, "G301": 1,  "G308": 1, "G309": 1}
+alzheimer_cols = [col for col in ukb.columns if re.search("^41270-", col)]
+ukb[alzheimer_cols] = ukb[alzheimer_cols].applymap(lambda x: alzheimer_dict.get(x, 0))
+# max available observation
+ukb["alzheimer"] = ukb[alzheimer_cols].bfill(axis=1).iloc[:,0]
+alzheimer = ukb.dropna(subset=["alzheimer"])[["FID", "IID", "alzheimer"]]
+
+# CATARACT
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6148
+cataract_dict = {-1: np.nan, -3: np.nan, -7: np.nan, 4:1}
+# take value 4 , otherwise 0
+cataract_cols = [col for col in ukb.columns if re.search("^6148-", col)]
+ukb[cataract_cols] = ukb[cataract_cols].applymap(lambda x: cataract_dict.get(x, 0))
+# use max observation as there shouldn't be inconsistencies
+ukb["cataract"] = ukb[cataract_cols].max(axis=1)
+cataract = ukb.dropna(subset=["cataract"])[["FID", "IID", "cataract"]]
+
+
 
 # write data
 ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
@@ -390,4 +413,5 @@ childrenEverFathered.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/cons
 obesitySevere.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/obesitySevere_pheno.txt", sep="\t", index=False, na_rep="NA")
 cancer.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancer_pheno.txt", sep="\t", index=False, na_rep="NA")
 risk.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/risk_pheno.txt", sep="\t", index=False, na_rep="NA")
-
+alzheimer.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/alzheimer_pheno.txt", sep="\t", index=False, na_rep="NA")
+cataract.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cataract_pheno.txt", sep="\t", index=False, na_rep="NA")
