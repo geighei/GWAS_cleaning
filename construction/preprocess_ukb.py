@@ -50,6 +50,10 @@ ukb_cols = ["eid", 		# Individual ID
 			"40006",	# Breast Cancer		
 			"30690",	# Cholesterol
 			"6150"		# Stroke
+			"2405", 	# Number of children fathered (male) 
+			"41204",	# Severe Obesity
+			"2453",		# Cancer
+			"2040",		# Risk taking behaviour
 ]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
@@ -313,9 +317,45 @@ totChol = ukb.dropna(subset=["totChol"])[["FID", "IID", "totChol"]]
 stroke_dict = {1:0, 3:1}
 stroke_cols = [col for col in ukb.columns if re.search("^6150-", col)]
 ukb[stroke_cols] = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, 0))
-# use first available observation
-ukb["stroke"] = ukb[stroke_cols].bfill(axis=1).iloc[:,0]
+# use max observation
+ukb["stroke"] = ukb[stroke_cols].max(axis=1)
 stroke = ukb.dropna(subset=["stroke"])[["FID", "IID", "stroke"]]
+
+# NUMBER OF CHILDREN FATHERED (MALE) 
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2405
+childrenEverFathered_dict = {-1: np.nan, -3: np.nan}
+childrenEverFathered_cols = [col for col in ukb.columns if re.search("^2405-", col)]
+ukb[childrenEverFathered_cols] = ukb[childrenEverFathered_cols].applymap(lambda x: childrenEverFathered_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["childrenEverFathered"] = ukb[childrenEverFathered_cols].max(axis=1)
+childrenEverFathered = ukb.dropna(subset=["childrenEverFathered"])[["FID", "IID", "childrenEverFathered"]]
+
+# SEVERE OBESITY
+# Obesity Question: http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
+obesitySevere_dict = {"E660": 1, "E661": 1, "E662": 1, "E663": 1, "E664": 1, "E665": 1, "E666": 1, "E667": 1, "E668": 1, "E669": 1}
+obesitySevere_cols = [col for col in ukb.columns if re.search("^41204-", col)]
+ukb[obesitySevere_cols] = ukb[obesitySevere_cols].applymap(lambda x: obesitySevere_dict.get(x, 0))
+# max available observation
+ukb["obesitySevere"] = ukb[obesitySevere_cols].bfill(axis=1).iloc[:,0]
+obesitySevere = ukb.dropna(subset=["obesitySevere"])[["FID", "IID", "obesitySevere"]]
+
+# CANCER
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2453
+cancer_dict = {-1: np.nan, -3: np.nan}
+cancer_cols = [col for col in ukb.columns if re.search("^2453-", col)]
+ukb[cancer_cols] = ukb[cancer_cols].applymap(lambda x: cancer_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["cancer"] = ukb[cancer_cols].max(axis=1)
+cancer = ukb.dropna(subset=["cancer"])[["FID", "IID", "cancer"]]
+
+# RISK TAKING BEHAVIOUR
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2040
+risk_dict = {-1: np.nan, -3: np.nan}
+risk_cols = [col for col in ukb.columns if re.search("^2040-", col)]
+ukb[risk_cols] = ukb[risk_cols].applymap(lambda x: risk_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["risk"] = ukb[risk_cols].max(axis=1)
+risk = ukb.dropna(subset=["risk"])[["FID", "IID", "risk"]]
 
 # write data
 ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
@@ -346,3 +386,8 @@ worryFeeling.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction
 cancerBreast.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancerBreast_pheno.txt", sep="\t", index=False, na_rep="NA")
 totChol.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/totChol_pheno.txt", sep="\t", index=False, na_rep="NA")
 stroke.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/stroke_pheno.txt", sep="\t", index=False, na_rep="NA")
+childrenEverFathered.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/childrenEverFathered_pheno.txt", sep="\t", index=False, na_rep="NA")
+obesitySevere.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/obesitySevere_pheno.txt", sep="\t", index=False, na_rep="NA")
+cancer.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancer_pheno.txt", sep="\t", index=False, na_rep="NA")
+risk.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/risk_pheno.txt", sep="\t", index=False, na_rep="NA")
+
