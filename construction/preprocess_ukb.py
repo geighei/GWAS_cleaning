@@ -60,6 +60,7 @@ ukb_cols = ["eid", 		# Individual ID
 			"2247",		# Hearing difficulty/problems
 			"2734",		# Number of live births (female) 
 			"20001",	# Number of live births (female) 	
+			"41204",	# Coronary artery disease (CAD) 	
 			]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
@@ -418,6 +419,15 @@ ukb[cancerProstate_cols] = ukb[cancerProstate_cols].applymap(lambda x: cancerPro
 ukb["cancerProstate"] = ukb[cancerProstate_cols].max(axis=1)
 cancerProstate = ukb.dropna(subset=["cancerProstate"])[["FID", "IID", "cancerProstate"]]
 
+# CORONARY HEART DESEADE
+# https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
+cad_dict = {"I250": 1, "I251": 1, "I252": 1, "I253": 1, "I254": 1, "I255": 1, "I256": 1, "I257": 1,  "I258": 1, "I259": 1}
+cad_cols = [col for col in ukb.columns if re.search("^41204-", col)]
+ukb[cad_cols] = ukb[cad_cols].applymap(lambda x: cad_dict.get(x, 0))
+# max available observation
+ukb["cad"] = ukb[cad_cols].max(axis=1)
+cad = ukb.dropna(subset=["cad"])[["FID", "IID", "cad"]]
+
 
 # write data
 ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
@@ -458,3 +468,4 @@ cataract.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cat
 hearingDifficulty.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/hearingDifficulty_pheno.txt", sep="\t", index=False, na_rep="NA")
 childrenEverMothered.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/childrenEverMothered_pheno.txt", sep="\t", index=False, na_rep="NA")
 cancerProstate.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancerProstate_pheno.txt", sep="\t", index=False, na_rep="NA")
+cad.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cad_pheno.txt", sep="\t", index=False, na_rep="NA")
