@@ -33,8 +33,8 @@ do
 done
 
 # step "3" - finalize regenie output for easyQC
-# bind together step 2 results
-awk 'FNR==1 && NR!=1{next;}{print}' $construction/dpw/full/*.regenie > $output/ukb_dpw_full.txt
+# bind together step 2 results, force overwrite
+awk 'FNR==1 && NR!=1{next;}{print}' $construction/dpw/full/ukb_dpw_chr*dpw.regenie > $output/ukb_dpw_full.txt
 
 # add N column to resulting file
 	# store number of samples for which we have the phenotype; this is an estimate, should be good enough
