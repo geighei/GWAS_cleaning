@@ -21,6 +21,8 @@ ukb_cols = ["eid", 		# Individual ID
 			"31-0.0",	# Gender
 			"34-0.0", 	# Year of birth
 			"22006-0.0",# Genetic ethnic grouping
+			"22027-0.0",# Outliers for heterozygosity or missing rate
+			"22019-0.0",# Sex chromosome aneuploidy
 			"22009",	# Principal components
 			"1568", "1578", "1588", "1598", "1608", "5364",
 						# Drinks per week
@@ -73,8 +75,9 @@ for chunk in ukb_iterator:
 ukb = pd.concat(chunk_list)
 
 #### CLEAN UKB DATA
-# filter on genetically caucasian individuals and relabel individual columns
-ukb = ukb[ukb["22006-0.0"] == 1]
+# filter on genetically caucasian individuals and filter out heterozygosity, sex outliers
+ukb = ukb[ukb["22006-0.0"] == 1 & ukb["22027-0.0"] != 1 & ukb["22019-0.0"] != 1]
+# relabel individual columns
 ukb.insert(0, "IID", ukb.eid)
 ukb.insert(0, "FID", ukb.eid)
 # covariates are gender, year of birth, and first 20 principal components
