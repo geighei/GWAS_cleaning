@@ -33,6 +33,7 @@ ukb_cols = ["eid", 		# Individual ID
 			"21001",	# Body Mass Index (BMI)
 			"20116",	# Smoking cessation
 			"41204",	# Type II Diabetes
+						# Type I Diabetes
 			"20018",	# Prospective memory test 
 			"6150",		# High blood pressure
 			"137",		# Treatments / medications taken 
@@ -50,7 +51,17 @@ ukb_cols = ["eid", 		# Individual ID
 			"40006",	# Breast Cancer		
 			"30690",	# Cholesterol
 			"6150"		# Stroke
-]
+			"2405", 	# Number of children fathered (male) 
+			"41204",	# Severe Obesity
+			"2453",		# Cancer
+			"2040",		# Risk taking behaviour
+			"41270",	# Alzheimer's
+			"6148",		# Cataract
+			"2247",		# Hearing difficulty/problems
+			"2734",		# Number of live births (female) 
+			"20001",	# Number of live births (female) 	
+			"41204",	# Coronary artery disease (CAD) 	
+			]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
 ukb_iterator = pd.read_csv("/home/ubuntu/biroli/ukb/ukb23283.csv.gz", engine="python", encoding = "ISO-8859-1",
@@ -175,6 +186,15 @@ ukb[t2d_cols] = ukb[t2d_cols].applymap(lambda x: t2d_dict.get(x, 0))
 # use first available observation to maintain consistency across individuals since it's binary
 ukb["t2d"] = ukb[t2d_cols].max(axis=1)
 t2d = ukb.dropna(subset=["t2d"])[["FID", "IID", "t2d"]]
+
+# TYPE I DIABETES
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=41204
+t1d_dict = {"E100": 1, "E101": 1, "E102": 1, "E103": 1, "E104": 1, "E105": 1, "E106": 1, "E107": 1, "E108": 1, "E109": 1}
+t1d_cols = [col for col in ukb.columns if re.search("^41204-", col)]
+ukb[t1d_cols] = ukb[t1d_cols].applymap(lambda x: t1d_dict.get(x, 0))
+# use first available observation to maintain consistency across individuals since it's binary
+ukb["t1d"] = ukb[t1d_cols].max(axis=1)
+t1d = ukb.dropna(subset=["t1d"])[["FID", "IID", "t1d"]]
 
 # PROSPECTIVE MEMORY TEST
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20018
@@ -313,9 +333,101 @@ totChol = ukb.dropna(subset=["totChol"])[["FID", "IID", "totChol"]]
 stroke_dict = {1:0, 3:1}
 stroke_cols = [col for col in ukb.columns if re.search("^6150-", col)]
 ukb[stroke_cols] = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, 0))
-# use first available observation
-ukb["stroke"] = ukb[stroke_cols].bfill(axis=1).iloc[:,0]
+# use max observation
+ukb["stroke"] = ukb[stroke_cols].max(axis=1)
 stroke = ukb.dropna(subset=["stroke"])[["FID", "IID", "stroke"]]
+
+# NUMBER OF CHILDREN FATHERED (MALE) 
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2405
+childrenEverFathered_dict = {-1: np.nan, -3: np.nan}
+childrenEverFathered_cols = [col for col in ukb.columns if re.search("^2405-", col)]
+ukb[childrenEverFathered_cols] = ukb[childrenEverFathered_cols].applymap(lambda x: childrenEverFathered_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["childrenEverFathered"] = ukb[childrenEverFathered_cols].max(axis=1)
+childrenEverFathered = ukb.dropna(subset=["childrenEverFathered"])[["FID", "IID", "childrenEverFathered"]]
+
+# SEVERE OBESITY
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
+obesitySevere_dict = {"E660": 1, "E661": 1, "E662": 1, "E663": 1, "E664": 1, "E665": 1, "E666": 1, "E667": 1, "E668": 1, "E669": 1}
+obesitySevere_cols = [col for col in ukb.columns if re.search("^41204-", col)]
+ukb[obesitySevere_cols] = ukb[obesitySevere_cols].applymap(lambda x: obesitySevere_dict.get(x, 0))
+# max available observation
+ukb["obesitySevere"] = ukb[obesitySevere_cols].bfill(axis=1).iloc[:,0]
+obesitySevere = ukb.dropna(subset=["obesitySevere"])[["FID", "IID", "obesitySevere"]]
+
+# CANCER
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2453
+cancer_dict = {-1: np.nan, -3: np.nan}
+cancer_cols = [col for col in ukb.columns if re.search("^2453-", col)]
+ukb[cancer_cols] = ukb[cancer_cols].applymap(lambda x: cancer_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["cancer"] = ukb[cancer_cols].max(axis=1)
+cancer = ukb.dropna(subset=["cancer"])[["FID", "IID", "cancer"]]
+
+# RISK TAKING BEHAVIOUR
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2040
+risk_dict = {-1: np.nan, -3: np.nan}
+risk_cols = [col for col in ukb.columns if re.search("^2040-", col)]
+ukb[risk_cols] = ukb[risk_cols].applymap(lambda x: risk_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["risk"] = ukb[risk_cols].max(axis=1)
+risk = ukb.dropna(subset=["risk"])[["FID", "IID", "risk"]]
+
+# ALZHEIMER'S
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41270
+alzheimer_dict = {"G300": 1, "G301": 1,  "G308": 1, "G309": 1}
+alzheimer_cols = [col for col in ukb.columns if re.search("^41270-", col)]
+ukb[alzheimer_cols] = ukb[alzheimer_cols].applymap(lambda x: alzheimer_dict.get(x, 0))
+# max available observation
+ukb["alzheimer"] = ukb[alzheimer_cols].bfill(axis=1).iloc[:,0]
+alzheimer = ukb.dropna(subset=["alzheimer"])[["FID", "IID", "alzheimer"]]
+
+# CATARACT
+# https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6148
+cataract_dict = {-1: np.nan, -3: np.nan, -7: np.nan, 4:1}
+# take value 4 , otherwise 0
+cataract_cols = [col for col in ukb.columns if re.search("^6148-", col)]
+ukb[cataract_cols] = ukb[cataract_cols].applymap(lambda x: cataract_dict.get(x, 0))
+# use max observation as there shouldn't be inconsistencies
+ukb["cataract"] = ukb[cataract_cols].max(axis=1)
+cataract = ukb.dropna(subset=["cataract"])[["FID", "IID", "cataract"]]
+
+# HEARING DIFFICULTY
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2247
+hearingDifficulty_dict = {-1: np.nan, -3: np.nan, 99: np.nan}
+hearingDifficulty_cols = [col for col in ukb.columns if re.search("^2247-", col)]
+ukb[hearingDifficulty_cols] = ukb[hearingDifficulty_cols].applymap(lambda x: hearingDifficulty_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["hearingDifficulty"] = ukb[hearingDifficulty_cols].max(axis=1)
+hearingDifficulty = ukb.dropna(subset=["hearingDifficulty"])[["FID", "IID", "hearingDifficulty"]]
+
+# NUMBER OF LIVE BIRTH (FEMALE) 
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2734
+childrenEverMothered_dict = {-3: np.nan}
+childrenEverMothered_cols = [col for col in ukb.columns if re.search("^2734-", col)]
+ukb[childrenEverMothered_cols] = ukb[childrenEverMothered_cols].applymap(lambda x: childrenEverMothered_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["childrenEverMothered"] = ukb[childrenEverMothered_cols].max(axis=1)
+childrenEverMothered = ukb.dropna(subset=["childrenEverMothered"])[["FID", "IID", "childrenEverMothered"]]
+
+# PROSTATE CANCER
+# http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20001
+cancerProstate_dict = {1002: 1}
+cancerProstate_cols = [col for col in ukb.columns if re.search("^20001-", col)]
+ukb[cancerProstate_cols] = ukb[cancerProstate_cols].applymap(lambda x: cancerProstate_dict.get(x, 0))
+# use max observation as there shouldn't be inconsistencies
+ukb["cancerProstate"] = ukb[cancerProstate_cols].max(axis=1)
+cancerProstate = ukb.dropna(subset=["cancerProstate"])[["FID", "IID", "cancerProstate"]]
+
+# CORONARY HEART DESEADE
+# https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
+cad_dict = {"I250": 1, "I251": 1, "I252": 1, "I253": 1, "I254": 1, "I255": 1, "I256": 1, "I257": 1,  "I258": 1, "I259": 1}
+cad_cols = [col for col in ukb.columns if re.search("^41204-", col)]
+ukb[cad_cols] = ukb[cad_cols].applymap(lambda x: cad_dict.get(x, 0))
+# max available observation
+ukb["cad"] = ukb[cad_cols].max(axis=1)
+cad = ukb.dropna(subset=["cad"])[["FID", "IID", "cad"]]
+
 
 # write data
 ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
@@ -329,6 +441,7 @@ smokeInit.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/sm
 bmi.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/bmi_pheno.txt", sep="\t", index=False, na_rep="NA")
 cesSmoke.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cesSmoke_pheno.txt", sep="\t", index=False, na_rep="NA")
 t2d.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/t2d_pheno.txt", sep="\t", index=False, na_rep="NA")
+t1d.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/t1d_pheno.txt", sep="\t", index=False, na_rep="NA")
 memoryTest.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/memoryTest_pheno.txt", sep="\t", index=False, na_rep="NA")
 highBloodPressure.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/highBloodPressure_pheno.txt", sep="\t", index=False, na_rep="NA")
 medsTaken.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/medsTaken_pheno.txt", sep="\t", index=False, na_rep="NA")
@@ -346,3 +459,13 @@ worryFeeling.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction
 cancerBreast.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancerBreast_pheno.txt", sep="\t", index=False, na_rep="NA")
 totChol.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/totChol_pheno.txt", sep="\t", index=False, na_rep="NA")
 stroke.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/stroke_pheno.txt", sep="\t", index=False, na_rep="NA")
+childrenEverFathered.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/childrenEverFathered_pheno.txt", sep="\t", index=False, na_rep="NA")
+obesitySevere.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/obesitySevere_pheno.txt", sep="\t", index=False, na_rep="NA")
+cancer.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancer_pheno.txt", sep="\t", index=False, na_rep="NA")
+risk.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/risk_pheno.txt", sep="\t", index=False, na_rep="NA")
+alzheimer.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/alzheimer_pheno.txt", sep="\t", index=False, na_rep="NA")
+cataract.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cataract_pheno.txt", sep="\t", index=False, na_rep="NA")
+hearingDifficulty.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/hearingDifficulty_pheno.txt", sep="\t", index=False, na_rep="NA")
+childrenEverMothered.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/childrenEverMothered_pheno.txt", sep="\t", index=False, na_rep="NA")
+cancerProstate.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancerProstate_pheno.txt", sep="\t", index=False, na_rep="NA")
+cad.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cad_pheno.txt", sep="\t", index=False, na_rep="NA")
