@@ -63,6 +63,7 @@ ukb_cols = ["eid", 		# Individual ID
 			"2734",		# Number of live births (female) 
 			"20001",	# Number of live births (female) 	
 			"41204",	# Coronary artery disease (CAD) 	
+			"4526",		# Well-being spectrum  	
 			]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
@@ -431,6 +432,23 @@ ukb[cad_cols] = ukb[cad_cols].applymap(lambda x: cad_dict.get(x, 0))
 ukb["cad"] = ukb[cad_cols].max(axis=1)
 cad = ukb.dropna(subset=["cad"])[["FID", "IID", "cad"]]
 
+# WELL-BEING SPECTRUM 
+# https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=4526
+wellBeingSpectrum_dict = {1:6 , 2:5 , 3:4 ,4:3 ,5:2 ,6:1 }
+wellBeingSpectrum_cols = [col for col in ukb.columns if re.search("^4526-", col)]
+ukb[wellBeingSpectrum_cols] = ukb[wellBeingSpectrum_cols].applymap(lambda x: wellBeingSpectrum_dict.get(x))
+# use max observation as there shouldn't be inconsistencies
+ukb["wellBeingSpectrum"] = ukb[wellBeingSpectrum_cols].mean(axis=1)
+wellBeingSpectrum = ukb.dropna(subset=["wellBeingSpectrum"])[["FID", "IID", "wellBeingSpectrum"]]
+
+# POSITIVE AFFECT
+#
+
+# DEPRESSIVE SYMPTOMS 
+#
+
+# LIFE SATISFACION
+#
 
 # write data
 ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
@@ -472,3 +490,4 @@ hearingDifficulty.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/constru
 childrenEverMothered.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/childrenEverMothered_pheno.txt", sep="\t", index=False, na_rep="NA")
 cancerProstate.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancerProstate_pheno.txt", sep="\t", index=False, na_rep="NA")
 cad.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cad_pheno.txt", sep="\t", index=False, na_rep="NA")
+wellBeingSpectrum.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/wellBeingSpectrum_pheno.txt", sep="\t", index=False, na_rep="NA")
