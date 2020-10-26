@@ -3,12 +3,13 @@ import numpy as np
 import subprocess
 import os
 from random import seed
+from contextlib import suppress
 
 # set seed so result of GWAS is fully replicable (assignment of folds is random)
 seed(112794)
 
 ### INPUTS --------------------------------- ###
-n_folds = 2 # this defines the number of times you want to split UKB and GWAS it
+n_folds = 10 # this defines the number of times you want to split UKB and GWAS it
 # constant file paths (note: add 'regenie' to your path so we don't need to point to it)
 construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/"
 # points to UKB non-imputed data for use in step 1 of regenie
@@ -17,7 +18,7 @@ geno_fp = "/home/ubuntu/UKB/genomeclean/ukb_non_imputed_best_guess_QC"
 pheno = "dpw"
 # sub-folder of this phenotypes folder where we will store results temporarily and write out folds
 sub_folder = "split_sample"
-out_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/"dpw/ukb_dpw_splitA.txt"
+out_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/dpw/ukb_dpw_splitA.txt"
 
 ### INTERMEDIATE SETUP --------------------- ###
 # input file paths
@@ -25,7 +26,9 @@ out_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/"dpw/ukb_dpw_
 covars_fp = construction_fp + "ukb_covars.txt"
 phenos_fp = construction_fp + pheno + "/" + pheno + "_pheno.txt"
 regenie_out_fp = construction_fp + pheno + "/" + sub_folder
-os.makedirs(regenie_out_fp)
+# make directory for regenie input/output if it doesn't already exist
+with suppress(FileExistsError):
+	os.makedirs(regenie_out_fp)
 
 # read fam file to get list of FID, IID pairs
 covars = pd.read_csv(covars, 
