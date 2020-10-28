@@ -9,7 +9,7 @@ from contextlib import suppress
 seed(112794)
 
 ### INPUTS --------------------------------- ###
-n_folds = 10 # this defines the number of times you want to split UKB and GWAS it
+n_folds = 2 # this defines the number of times you want to split UKB and GWAS it
 # constant file paths (note: add 'regenie' to your path so we don't need to point to it)
 construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/"
 # points to UKB non-imputed data for use in step 1 of regenie
@@ -31,10 +31,11 @@ with suppress(FileExistsError):
 
 # read pheno file to get list of FID, IID pairs that we want to use in analysis
 samples = pd.read_csv(phenos_fp, usecols=["FID", "IID"], delim_whitespace=True)
+
 # randomly re-label each sample with unique number and use these to form n uniform-sized folds
 n_samples = len(samples.index)
 samples["random"] = np.random.choice(n_samples, n_samples, replace=False)
-samples["fold"] = samples.random % n_folds
+samples["fold"] = (samples.random % n_folds) + 1
 
 ### CALL REGENIE --------------------------- ###
 for fold in np.arange(1,2): # should be np.arange(1,n_folds+1)
