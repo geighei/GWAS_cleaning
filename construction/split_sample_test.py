@@ -44,7 +44,7 @@ samples["random"] = np.random.choice(n_samples, n_samples, replace=False)
 samples["fold"] = (samples.random % n_folds) + 1
 
 ### CALL REGENIE --------------------------- ###
-for fold in np.arange(1,2): # should be np.arange(1,n_folds+1)
+for fold in np.arange(1,n_folds+1): # should be np.arange(1,n_folds+1)
 	# select fold subset and write to drive
 	fold_ids = samples[samples.fold == fold][["FID", "IID"]]
 	fold_ids_fp = os.path.join(regenie_out_fp, "fold"+str(fold)+".txt")

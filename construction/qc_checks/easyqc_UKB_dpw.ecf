@@ -25,7 +25,7 @@ DEFINE	--pathOut /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw
 
 ### Falls outside loop, issue? Richard constructs many of these files...solve
 
-EASYIN	--fileIn /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/dpw/ukb_dpw_full.txt --fileInShortName dpw_full --astrSetNumCol MAF_THRESHOLD=0.005;INFO_THRESHOLD=0.9;SDY=11.6
+EASYIN	--fileIn /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/dpw/ukb_dpw_split1.txt --fileInShortName dpw_full --astrSetNumCol MAF_THRESHOLD=0.005;INFO_THRESHOLD=0.9;SDY=11.6
 
 ##############################################################
 ## 0. Start EasyQC scripting interface                      ##
