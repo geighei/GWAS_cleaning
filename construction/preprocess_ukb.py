@@ -63,7 +63,7 @@ ukb_cols = ["eid", 		# Individual ID
 			"2734",		# Number of live births (female) 
 			"20001",	# Number of live births (female) 	
 			"41204",	# Coronary artery disease (CAD) 	
-			"4526",		# Well-being spectrum  	
+			"4526"		# Well-being spectrum  	
 			]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
@@ -76,8 +76,14 @@ for chunk in ukb_iterator:
 ukb = pd.concat(chunk_list)
 
 #### CLEAN UKB DATA
+
 # filter on genetically caucasian individuals and filter out heterozygosity, sex outliers
 ukb = ukb[(ukb["22006-0.0"] == 1) & (ukb["22027-0.0"] != 1) & (ukb["22019-0.0"] != 1)]
+# remove siblings so they can be used as validation
+sibs = pd.read_csv("/home/ubuntu/biroli/ukb/family_siblings_UKB.csv", usecols=["ID"])
+non_sibs = set(ukb.eid).difference(sibs.ID)
+ukb = ukb[ukb.eid.isin(non_sibs)]
+
 # relabel individual columns
 ukb.insert(0, "IID", ukb.eid)
 ukb.insert(0, "FID", ukb.eid)
