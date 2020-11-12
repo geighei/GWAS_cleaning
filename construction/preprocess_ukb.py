@@ -272,7 +272,7 @@ arthritis = ukb.dropna(subset=["arthritis"])[["FID", "IID", "arthritis"]]
 nonCancerIllness_cols = [col for col in ukb.columns if re.search("^135-", col)]
 # use max observation as there shouldn't be inconsistencies
 ukb["nonCancerIllness"] = ukb[nonCancerIllness_cols].max(axis=1)
-nonCancerIllness_cols = ukb.dropna(subset=["nonCancerIllness"])[["FID", "IID", "nonCancerIllness"]]
+nonCancerIllness = ukb.dropna(subset=["nonCancerIllness"])[["FID", "IID", "nonCancerIllness"]]
 
 # ANXIETY
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20421
@@ -427,7 +427,7 @@ ukb_cad = ukb[diagnosis_cols].applymap(lambda x: cad_dict.get(x, 0))
 # max available observation
 ukb["cad"] = ukb_cad.max(axis=1)
 cad = ukb.dropna(subset=["cad"])[["FID", "IID", "cad"]]
-ukb_cad
+del ukb_cad
 
 # WELL-BEING SPECTRUM 
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=4526
