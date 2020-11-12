@@ -2,19 +2,6 @@ import pandas as pd
 import numpy as np
 import re
 
-#### DPW
-# dpw is an exception of sorts since we already had cleaned it some extent in alcohol panel
-# panel = pd.read_csv("/home/ubuntu/biroli/geighei/code/alcoholGxE/inputs/alcohol_analysis_panel.csv")
-# # include first non-missing wave for each sample, throwing out all obs for which we don't have dpw
-# non_missing = panel.dropna(subset=["drinks_per_week"]).groupby(["v_eid"], as_index=False).first()
-
-# non_missing["FID"] = non_missing["v_eid"]
-# non_missing["IID"] = non_missing["v_eid"]
-
-# dpw = non_missing[["FID", "IID", "drinks_per_week"]]
-# covars = non_missing[["FID", "IID", "male", "year_of_birth", "PC_1", "PC_2", "PC_3", "PC_4", "PC_5", "PC_6", "PC_7", "PC_8", "PC_9", "PC_10",
-# 						"PC_11", "PC_12", "PC_13", "PC_14", "PC_15", "PC_16", "PC_17", "PC_18", "PC_19", "PC_20"]]
-
 #### READ UKB DATA
 # del panel, non_missing
 ukb_cols = ["eid", 		# Individual ID
@@ -34,8 +21,12 @@ ukb_cols = ["eid", 		# Individual ID
 			"2867",		# Age started smoking
 			"21001",	# Body Mass Index (BMI)
 			"20116",	# Smoking cessation
-			"41204",	# Type II Diabetes
+			"41202", "41204",
 						# Type I Diabetes
+						# Type II Diabetes
+						# Severe Obesity
+						# Coronary artery disease (CAD)
+						# Alzheimer's Disease
 			"20018",	# Prospective memory test 
 			"6150",		# High blood pressure
 			"137",		# Treatments / medications taken 
@@ -54,7 +45,6 @@ ukb_cols = ["eid", 		# Individual ID
 			"30690",	# Cholesterol
 			"6150"		# Stroke
 			"2405", 	# Number of children fathered (male) 
-			"41204",	# Severe Obesity
 			"2453",		# Cancer
 			"2040",		# Risk taking behaviour
 			"41270",	# Alzheimer's
@@ -62,7 +52,6 @@ ukb_cols = ["eid", 		# Individual ID
 			"2247",		# Hearing difficulty/problems
 			"2734",		# Number of live births (female) 
 			"20001",	# Number of live births (female) 	
-			"41204",	# Coronary artery disease (CAD) 	
 			"4526"		# Well-being spectrum  	
 			]
 
@@ -76,7 +65,6 @@ for chunk in ukb_iterator:
 ukb = pd.concat(chunk_list)
 
 #### CLEAN UKB DATA
-
 # filter on genetically caucasian individuals and filter out heterozygosity, sex outliers
 ukb = ukb[(ukb["22006-0.0"] == 1) & (ukb["22027-0.0"] != 1) & (ukb["22019-0.0"] != 1)]
 # remove siblings so they can be used as validation
@@ -90,6 +78,9 @@ ukb.insert(0, "FID", ukb.eid)
 # covariates are gender, year of birth, and first 20 principal components
 covar_cols = [col for col in ukb.columns if re.search("^(FID|IID|31-0\.0|34-0\.0|22009-0\.([1-9]$|1[0-9]|20))", col)]
 ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
+
+# set of columns to use for all self-reported diagnoses
+diagnosis_cols = [col for col in ukb.columns if re.search("^4120(2|4)-", col)]
 
 # DRINKS PER WEEK
 # construction taken from biroli/ukb/alcohol/alcohol_panel_construction/reshape_ukb.R
@@ -126,12 +117,12 @@ educ = ukb.dropna(subset=["educYears"])[["FID", "IID", "educYears"]]
 
 # HOUSEHOLD INCOME
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100294
-hhi_dict = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5}
-hhi_cols = [col for col in ukb.columns if re.search("^738-", col)]
-ukb[hhi_cols] = ukb[hhi_cols].applymap(lambda x: hhi_dict.get(x))
+householdIncome_dict = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5}
+householdIncome_cols = [col for col in ukb.columns if re.search("^738-", col)]
+ukb[householdIncome_cols] = ukb[householdIncome_cols].applymap(lambda x: householdIncome_dict.get(x))
 # went with maximum since an average might be skewed by retirement, lay-offs, etc
-ukb["hhi"] = ukb[hhi_cols].max(axis=1)
-hhi = ukb.dropna(subset=["hhi"])[["FID", "IID", "hhi"]]
+ukb["householdIncome"] = ukb[householdIncome_cols].max(axis=1)
+householdIncome = ukb.dropna(subset=["householdIncome"])[["FID", "IID", "householdIncome"]]
 
 # HEALTH RATING
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100508
@@ -139,28 +130,28 @@ health_dict = {1: 4, 2: 3, 3: 2, 4: 1}
 health_cols = [col for col in ukb.columns if re.search("^2178-", col)]
 ukb[health_cols] = ukb[health_cols].applymap(lambda x: health_dict.get(x))
 # average health
-ukb["health_rating"] = ukb[health_cols].mean(axis=1)
-health = ukb.dropna(subset=["health_rating"])[["FID", "IID", "health_rating"]]
+ukb["healthRating"] = ukb[health_cols].mean(axis=1)
+health = ukb.dropna(subset=["healthRating"])[["FID", "IID", "healthRating"]]
 
 # CIGARETTES PER DAY
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=2887
 # only need to re-code negative values, others are in cigarette units already
-cpd_dict = {-10: 0, -1: np.nan}
-cpd_cols = [col for col in ukb.columns if re.search("^2887-", col)]
-ukb[cpd_cols] = ukb[cpd_cols].applymap(lambda x: cpd_dict.get(x, x))
+maxcpd_dict = {-10: 0, -1: np.nan}
+maxcpd_cols = [col for col in ukb.columns if re.search("^2887-", col)]
+ukb[maxcpd_cols] = ukb[maxcpd_cols].applymap(lambda x: maxcpd_dict.get(x, x))
 # we want to measure propensity to addiction so maximum is more appropriate
-ukb["cpd"] = ukb[cpd_cols].max(axis=1)
-cpd = ukb.dropna(subset=["cpd"])[["FID", "IID", "cpd"]]
+ukb["maxcpd"] = ukb[maxcpd_cols].max(axis=1)
+maxcpd = ukb.dropna(subset=["maxcpd"])[["FID", "IID", "maxcpd"]]
 
 # AGE FIRST BIRTH (female)
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=2754
 # only need to re-code negative values, others are in year units already
-afb_dict = {-4: np.nan, -3: np.nan}
-afb_cols = [col for col in ukb.columns if re.search("^2754-", col)]
-ukb[afb_cols] = ukb[afb_cols].applymap(lambda x: afb_dict.get(x, x))
+ageFirstBirth_dict = {-4: np.nan, -3: np.nan}
+ageFirstBirth_cols = [col for col in ukb.columns if re.search("^2754-", col)]
+ukb[ageFirstBirth_cols] = ukb[ageFirstBirth_cols].applymap(lambda x: ageFirstBirth_dict.get(x, x))
 # use first available observation as there shouldn't be inconsistencies
-ukb["afb"] = ukb[afb_cols].bfill(axis=1).iloc[:,0]
-afb = ukb.dropna(subset=["afb"])[["FID", "IID", "afb"]]
+ukb["ageFirstBirth"] = ukb[ageFirstBirth_cols].bfill(axis=1).iloc[:,0]
+ageFirstBirth = ukb.dropna(subset=["ageFirstBirth"])[["FID", "IID", "ageFirstBirth"]]
 
 # AGE STARTED SMOKING
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=2867
@@ -191,20 +182,20 @@ cesSmoke = ukb.dropna(subset=["cesSmoke"])[["FID", "IID", "cesSmoke"]]
 # TYPE II DIABETES
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=41204
 t2d_dict = {"E110": 1, "E111": 1, "E112": 1, "E113": 1, "E114": 1, "E115": 1, "E116": 1, "E117": 1, "E118": 1, "E119": 1}
-t2d_cols = [col for col in ukb.columns if re.search("^41204-", col)]
-ukb[t2d_cols] = ukb[t2d_cols].applymap(lambda x: t2d_dict.get(x, 0))
-# use first available observation to maintain consistency across individuals since it's binary
-ukb["t2d"] = ukb[t2d_cols].max(axis=1)
+ukb_t2d = ukb[diagnosis_cols].applymap(lambda x: t2d_dict.get(x, 0))
+# select any observation equal to 1
+ukb["t2d"] = ukb_t2d.max(axis=1)
 t2d = ukb.dropna(subset=["t2d"])[["FID", "IID", "t2d"]]
+del ukb_t2d
 
 # TYPE I DIABETES
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=41204
 t1d_dict = {"E100": 1, "E101": 1, "E102": 1, "E103": 1, "E104": 1, "E105": 1, "E106": 1, "E107": 1, "E108": 1, "E109": 1}
-t1d_cols = [col for col in ukb.columns if re.search("^41204-", col)]
-ukb[t1d_cols] = ukb[t1d_cols].applymap(lambda x: t1d_dict.get(x, 0))
+ukb_t1d = ukb[diagnosis_cols].applymap(lambda x: t1d_dict.get(x, 0))
 # use first available observation to maintain consistency across individuals since it's binary
-ukb["t1d"] = ukb[t1d_cols].max(axis=1)
+ukb["t1d"] = ukb_t1d.max(axis=1)
 t1d = ukb.dropna(subset=["t1d"])[["FID", "IID", "t1d"]]
+del ukb_t1d
 
 # PROSPECTIVE MEMORY TEST
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20018
@@ -269,11 +260,11 @@ insomniaFrequent = ukb.dropna(subset=["insomniaFrequent"])[["FID", "IID", "insom
 
 # ARTHRITIS 
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20002
-arthritis_dict = {99999: np.nan, 1465: 1}
+arthritis_dict = {1465: 1}
 arthritis_cols = [col for col in ukb.columns if re.search("^20002-", col)]
-ukb[arthritis_cols] = ukb[arthritis_cols].applymap(lambda x: arthritis_dict.get(x, x))
+ukb[arthritis_cols] = ukb[arthritis_cols].applymap(lambda x: arthritis_dict.get(x, 0))
 # use fist available observation as there shouldn't be inconsistencies
-ukb["arthritis"] = ukb[arthritis_cols].bfill(axis=1).iloc[:,0]
+ukb["arthritis"] = ukb[arthritis_cols].max(axis=1)
 arthritis = ukb.dropna(subset=["arthritis"])[["FID", "IID", "arthritis"]]
 
 # NON-CANCER ILNESSES
@@ -359,17 +350,17 @@ childrenEverFathered = ukb.dropna(subset=["childrenEverFathered"])[["FID", "IID"
 # SEVERE OBESITY
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
 obesitySevere_dict = {"E660": 1, "E661": 1, "E662": 1, "E663": 1, "E664": 1, "E665": 1, "E666": 1, "E667": 1, "E668": 1, "E669": 1}
-obesitySevere_cols = [col for col in ukb.columns if re.search("^41204-", col)]
-ukb[obesitySevere_cols] = ukb[obesitySevere_cols].applymap(lambda x: obesitySevere_dict.get(x, 0))
+ukb_obesitySevere = ukb[diagnosis_cols].applymap(lambda x: obesitySevere_dict.get(x, 0))
 # max available observation
-ukb["obesitySevere"] = ukb[obesitySevere_cols].bfill(axis=1).iloc[:,0]
+ukb["obesitySevere"] = ukb_obesitySevere.max(axis=1)
 obesitySevere = ukb.dropna(subset=["obesitySevere"])[["FID", "IID", "obesitySevere"]]
+del ukb_obesitySevere
 
 # CANCER
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2453
 cancer_dict = {-1: np.nan, -3: np.nan}
 cancer_cols = [col for col in ukb.columns if re.search("^2453-", col)]
-ukb[cancer_cols] = ukb[cancer_cols].applymap(lambda x: cancer_dict.get(x))
+ukb[cancer_cols] = ukb[cancer_cols].applymap(lambda x: cancer_dict.get(x, x))
 # use max observation as there shouldn't be inconsistencies
 ukb["cancer"] = ukb[cancer_cols].max(axis=1)
 cancer = ukb.dropna(subset=["cancer"])[["FID", "IID", "cancer"]]
@@ -378,7 +369,7 @@ cancer = ukb.dropna(subset=["cancer"])[["FID", "IID", "cancer"]]
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2040
 risk_dict = {-1: np.nan, -3: np.nan}
 risk_cols = [col for col in ukb.columns if re.search("^2040-", col)]
-ukb[risk_cols] = ukb[risk_cols].applymap(lambda x: risk_dict.get(x))
+ukb[risk_cols] = ukb[risk_cols].applymap(lambda x: risk_dict.get(x, x))
 # use max observation as there shouldn't be inconsistencies
 ukb["risk"] = ukb[risk_cols].max(axis=1)
 risk = ukb.dropna(subset=["risk"])[["FID", "IID", "risk"]]
@@ -386,11 +377,11 @@ risk = ukb.dropna(subset=["risk"])[["FID", "IID", "risk"]]
 # ALZHEIMER'S
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41270
 alzheimer_dict = {"G300": 1, "G301": 1,  "G308": 1, "G309": 1}
-alzheimer_cols = [col for col in ukb.columns if re.search("^41270-", col)]
-ukb[alzheimer_cols] = ukb[alzheimer_cols].applymap(lambda x: alzheimer_dict.get(x, 0))
+ukb_alzheimer = ukb[diagnosis_cols].applymap(lambda x: alzheimer_dict.get(x, 0))
 # max available observation
-ukb["alzheimer"] = ukb[alzheimer_cols].bfill(axis=1).iloc[:,0]
+ukb["alzheimer"] = ukb_alzheimer.max(axis=1)
 alzheimer = ukb.dropna(subset=["alzheimer"])[["FID", "IID", "alzheimer"]]
+del ukb_alzheimer
 
 # CATARACT
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6148
@@ -432,11 +423,11 @@ cancerProstate = ukb.dropna(subset=["cancerProstate"])[["FID", "IID", "cancerPro
 # CORONARY HEART DISEASE
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
 cad_dict = {"I250": 1, "I251": 1, "I252": 1, "I253": 1, "I254": 1, "I255": 1, "I256": 1, "I257": 1,  "I258": 1, "I259": 1}
-cad_cols = [col for col in ukb.columns if re.search("^41204-", col)]
-ukb[cad_cols] = ukb[cad_cols].applymap(lambda x: cad_dict.get(x, 0))
+ukb_cad = ukb[diagnosis_cols].applymap(lambda x: cad_dict.get(x, 0))
 # max available observation
-ukb["cad"] = ukb[cad_cols].max(axis=1)
+ukb["cad"] = ukb_cad.max(axis=1)
 cad = ukb.dropna(subset=["cad"])[["FID", "IID", "cad"]]
+ukb_cad
 
 # WELL-BEING SPECTRUM 
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=4526
@@ -459,10 +450,10 @@ wellBeingSpectrum = ukb.dropna(subset=["wellBeingSpectrum"])[["FID", "IID", "wel
 # write data
 dpw.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt", sep="\t", index=False, na_rep="NA")
 educ.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/educYears/educYears_pheno.txt", sep="\t", index=False, na_rep="NA")
-hhi.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/householdIncome/householdIncome_pheno.txt", sep="\t", index=False, na_rep="NA")
+householdIncome.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/householdIncome/householdIncome_pheno.txt", sep="\t", index=False, na_rep="NA")
 health.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/healthRating/healthRating_pheno.txt", sep="\t", index=False, na_rep="NA")
-cpd.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/maxCPD/maxCPD_pheno.txt", sep="\t", index=False, na_rep="NA")
-afb.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ageFirstBirth/ageFirstBirth_pheno.txt", sep="\t", index=False, na_rep="NA")
+maxcpd.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/maxmaxcpd/maxmaxcpd_pheno.txt", sep="\t", index=False, na_rep="NA")
+ageFirstBirth.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ageFirstBirth/ageFirstBirth_pheno.txt", sep="\t", index=False, na_rep="NA")
 smokeInit.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/smokeInit/smokeInit_pheno.txt", sep="\t", index=False, na_rep="NA")
 bmi.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/bmi/bmi_pheno.txt", sep="\t", index=False, na_rep="NA")
 cesSmoke.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cesSmoke/cesSmoke_pheno.txt", sep="\t", index=False, na_rep="NA")
