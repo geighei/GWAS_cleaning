@@ -52,7 +52,9 @@ ukb_cols = ["eid", 		# Individual ID
 			"2247",		# Hearing difficulty/problems
 			"2734",		# Number of live births (female) 
 			"20001",	# Number of live births (female) 	
-			"4526"		# Well-being spectrum  	
+			"20458",	# Positive Affect
+			"20460",	# Life Satisfaction	  	
+			"20016", 	# Cognitive Performance
 			]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
@@ -109,7 +111,7 @@ del ukb_dpw
 educ_dict = {1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1, -7: np.nan, -3: np.nan}
 # convert all "qualification" columns to years of education
 educ_cols = [col for col in ukb.columns if re.search("^6138-", col)]
-ukb[educ_cols] = ukb[educ_cols].applymap(lambda x: educ_dict.get(x))
+ukb[educ_cols] = ukb[educ_cols].applymap(lambda x: educ_dict.get(x,0))
 # take maximum value reported, send to new column
 ukb["educYears"] = ukb[educ_cols].max(axis=1)
 # filter columns to only keep fid, iid, and education and rows to remove missing education
@@ -119,7 +121,7 @@ educ = ukb.dropna(subset=["educYears"])[["FID", "IID", "educYears"]]
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100294
 householdIncome_dict = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5}
 householdIncome_cols = [col for col in ukb.columns if re.search("^738-", col)]
-ukb[householdIncome_cols] = ukb[householdIncome_cols].applymap(lambda x: householdIncome_dict.get(x))
+ukb[householdIncome_cols] = ukb[householdIncome_cols].applymap(lambda x: householdIncome_dict.get(x,0))
 # went with maximum since an average might be skewed by retirement, lay-offs, etc
 ukb["householdIncome"] = ukb[householdIncome_cols].max(axis=1)
 householdIncome = ukb.dropna(subset=["householdIncome"])[["FID", "IID", "householdIncome"]]
@@ -128,7 +130,7 @@ householdIncome = ukb.dropna(subset=["householdIncome"])[["FID", "IID", "househo
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100508
 health_dict = {1: 4, 2: 3, 3: 2, 4: 1}
 health_cols = [col for col in ukb.columns if re.search("^2178-", col)]
-ukb[health_cols] = ukb[health_cols].applymap(lambda x: health_dict.get(x))
+ukb[health_cols] = ukb[health_cols].applymap(lambda x: health_dict.get(x,0))
 # average health
 ukb["healthRating"] = ukb[health_cols].mean(axis=1)
 health = ukb.dropna(subset=["healthRating"])[["FID", "IID", "healthRating"]]
@@ -167,14 +169,14 @@ smokeInit = ukb.dropna(subset=["smokeInit"])[["FID", "IID", "smokeInit"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=21001
 bmi_cols = [col for col in ukb.columns if re.search("^21001-", col)]
 # use first available observation, for vast majority this is initial assessment
-ukb["bmi"] = ukb[bmi_cols].bfill(axis=1).iloc[:, 0]
+ukb["bmi"] = ukb[bmi_cols].mean(axis=1).iloc[:, 0]
 bmi = ukb.dropna(subset=["bmi"])[["FID", "IID", "bmi"]]
 
 # SMOKING CESSATION
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=90
 cesSmoke_dict = {2: 0, 1: 1}
 cesSmoke_cols = [col for col in ukb.columns if re.search("^20116-", col)]
-ukb[cesSmoke_cols] = ukb[cesSmoke_cols].applymap(lambda x: cesSmoke_dict.get(x))
+ukb[cesSmoke_cols] = ukb[cesSmoke_cols].applymap(lambda x: cesSmoke_dict.get(x,0))
 # use first available observation to maintain consistency across individuals since it's binary
 ukb["cesSmoke"] = ukb[cesSmoke_cols].bfill(axis=1).iloc[:,0]
 cesSmoke = ukb.dropna(subset=["cesSmoke"])[["FID", "IID", "cesSmoke"]]
@@ -201,7 +203,7 @@ del ukb_t1d
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20018
 memoryTest_dict = {0: 0, 1: 2, 2: 1}
 memoryTest_cols = [col for col in ukb.columns if re.search("^20018-", col)]
-ukb[memoryTest_cols] = ukb[memoryTest_cols].applymap(lambda x: memoryTest_dict.get(x))
+ukb[memoryTest_cols] = ukb[memoryTest_cols].applymap(lambda x: memoryTest_dict.get(x,0))
 # use average value across individuals 
 ukb["memoryTest"] = ukb[memoryTest_cols].mean(axis=1)
 memoryTest = ukb.dropna(subset=["memoryTest"])[["FID", "IID", "memoryTest"]]
@@ -210,7 +212,7 @@ memoryTest = ukb.dropna(subset=["memoryTest"])[["FID", "IID", "memoryTest"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
 highBloodPressure_dict = { 1: 0, 2: 0, 3: 0, -3: np.nan, -7: 0}
 highBloodPressure_cols = [col for col in ukb.columns if re.search("^6150-", col)]
-ukb[highBloodPressure_cols] = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x))
+ukb[highBloodPressure_cols] = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x,0))
 # use maximum to maintain consistency across individuals since it's binary
 ukb["highBloodPressure"] = ukb[highBloodPressure_cols].max(axis=1)
 highBloodPressure = ukb.dropna(subset=["highBloodPressure"])[["FID", "IID", "highBloodPressure"]]
@@ -226,16 +228,16 @@ medsTaken = ukb.dropna(subset=["medsTaken"])[["FID", "IID", "medsTaken"]]
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2020 
 loneliness_dict = {-1: np.nan, -3: np.nan}
 loneliness_cols = [col for col in ukb.columns if re.search("^2020-", col)]
-ukb[loneliness_cols] = ukb[loneliness_cols].applymap(lambda x: loneliness_dict.get(x))
+ukb[loneliness_cols] = ukb[loneliness_cols].applymap(lambda x: loneliness_dict.get(x,0))
 # use first available observation as there shouldn't be inconsistencies
-ukb["loneliness"] = ukb[loneliness_cols].bfill(axis=1).iloc[:,0]
+ukb["loneliness"] = ukb[loneliness_cols].max(axis=1)
 loneliness = ukb.dropna(subset=["loneliness"])[["FID", "IID", "loneliness"]]
 
 # SMOKE INITIATION
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20116
 smokeInit_dict = {-3: np.nan, 2: 1}
 smokeInit_cols = [col for col in ukb.columns if re.search("^20116-", col)]
-ukb[smokeInit_cols] = ukb[smokeInit_cols].applymap(lambda x: smokeInit_dict.get(x))
+ukb[smokeInit_cols] = ukb[smokeInit_cols].applymap(lambda x: smokeInit_dict.get(x,0))
 # use last available observation as there shouldn't be inconsistencies
 ukb["smokeInit"] = ukb[smokeInit_cols].ffill(axis=1).iloc[:,0]
 smokeInit = ukb.dropna(subset=["smokeInit"])[["FID", "IID", "smokeInit"]]
@@ -244,7 +246,7 @@ smokeInit = ukb.dropna(subset=["smokeInit"])[["FID", "IID", "smokeInit"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20126
 depress_dict = { 0: 0 ,  1: 0 ,  2: 0 , 3: 1,  4: 1, 5: 1 }
 depress_cols = [col for col in ukb.columns if re.search("^20126-", col)]
-ukb[depress_cols] = ukb[depress_cols].applymap(lambda x: depress_dict.get(x))
+ukb[depress_cols] = ukb[depress_cols].applymap(lambda x: depress_dict.get(x,0))
 # use max observation as there shouldn't be inconsistencies
 ukb["depress"] = ukb[depress_cols].max(axis=1)
 depress = ukb.dropna(subset=["depress"])[["FID", "IID", "depress"]]
@@ -253,7 +255,7 @@ depress = ukb.dropna(subset=["depress"])[["FID", "IID", "depress"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=1200
 insomniaFrequent_dict = {-3: np.nan}
 insomniaFrequent_cols = [col for col in ukb.columns if re.search("^1200-", col)]
-ukb[insomniaFrequent_cols] = ukb[insomniaFrequent_cols].applymap(lambda x: insomniaFrequent_dict.get(x))
+ukb[insomniaFrequent_cols] = ukb[insomniaFrequent_cols].applymap(lambda x: insomniaFrequent_dict.get(x,0))
 # use max observation as there shouldn't be inconsistencies
 ukb["insomniaFrequent"] = ukb[insomniaFrequent_cols].max(axis=1)
 insomniaFrequent = ukb.dropna(subset=["insomniaFrequent"])[["FID", "IID", "insomniaFrequent"]]
@@ -278,9 +280,9 @@ nonCancerIllness = ukb.dropna(subset=["nonCancerIllness"])[["FID", "IID", "nonCa
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20421
 anxiety_dict = {-818: np.nan, -121: np.nan}
 anxiety_cols = [col for col in ukb.columns if re.search("^20421-", col)]
-ukb[anxiety_cols] = ukb[anxiety_cols].applymap(lambda x: anxiety_dict.get(x))
+ukb[anxiety_cols] = ukb[anxiety_cols].applymap(lambda x: anxiety_dict.get(x,0))
 # use fist available observation as there shouldn't be inconsistencies
-ukb["anxiety"] = ukb[anxiety_cols].bfill(axis=1).iloc[:,0]
+ukb["anxiety"] = ukb[anxiety_cols].max(axis=1)
 anxiety = ukb.dropna(subset=["anxiety"])[["FID", "IID", "anxiety"]]
 
 # HEIGHT
@@ -308,7 +310,7 @@ neuroticismScore = ukb.dropna(subset=["neuroticismScore"])[["FID", "IID", "neuro
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2000
 worryFeeling_dict = {-1: np.nan, -3: np.nan}
 worryFeeling_cols = [col for col in ukb.columns if re.search("^2000-", col)]
-ukb[worryFeeling_cols] = ukb[worryFeeling_cols].applymap(lambda x: worryFeeling_dict.get(x))
+ukb[worryFeeling_cols] = ukb[worryFeeling_cols].applymap(lambda x: worryFeeling_dict.get(x,0))
 # use fist available observation as there shouldn't be inconsistencies
 ukb["worryFeeling"] = ukb[worryFeeling_cols].max(axis=1)
 worryFeeling = ukb.dropna(subset=["worryFeeling"])[["FID", "IID", "worryFeeling"]]
@@ -319,7 +321,7 @@ cancerBreast_dict = {"C500": 1, "C501": 1, "C502": 1, "C503": 1, "C504": 1, "C50
 cancerBreast_cols = [col for col in ukb.columns if re.search("^40006-", col)]
 ukb[cancerBreast_cols] = ukb[cancerBreast_cols].applymap(lambda x: cancerBreast_dict.get(x, 0))
 # First available observation
-ukb["cancerBreast"] = ukb[cancerBreast_cols].bfill(axis=1).iloc[:,0]
+ukb["cancerBreast"] = ukb[cancerBreast_cols].max(axis=1)
 cancerBreast = ukb.dropna(subset=["cancerBreast"])[["FID", "IID", "cancerBreast"]]
 
 # CHOLESTEROL
@@ -342,7 +344,7 @@ stroke = ukb.dropna(subset=["stroke"])[["FID", "IID", "stroke"]]
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2405
 childrenEverFathered_dict = {-1: np.nan, -3: np.nan}
 childrenEverFathered_cols = [col for col in ukb.columns if re.search("^2405-", col)]
-ukb[childrenEverFathered_cols] = ukb[childrenEverFathered_cols].applymap(lambda x: childrenEverFathered_dict.get(x))
+ukb[childrenEverFathered_cols] = ukb[childrenEverFathered_cols].applymap(lambda x: childrenEverFathered_dict.get(x,0))
 # use max observation as there shouldn't be inconsistencies
 ukb["childrenEverFathered"] = ukb[childrenEverFathered_cols].max(axis=1)
 childrenEverFathered = ukb.dropna(subset=["childrenEverFathered"])[["FID", "IID", "childrenEverFathered"]]
@@ -397,7 +399,7 @@ cataract = ukb.dropna(subset=["cataract"])[["FID", "IID", "cataract"]]
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2247
 hearingDifficulty_dict = {-1: np.nan, -3: np.nan, 99: np.nan}
 hearingDifficulty_cols = [col for col in ukb.columns if re.search("^2247-", col)]
-ukb[hearingDifficulty_cols] = ukb[hearingDifficulty_cols].applymap(lambda x: hearingDifficulty_dict.get(x))
+ukb[hearingDifficulty_cols] = ukb[hearingDifficulty_cols].applymap(lambda x: hearingDifficulty_dict.get(x,0))
 # use max observation as there shouldn't be inconsistencies
 ukb["hearingDifficulty"] = ukb[hearingDifficulty_cols].max(axis=1)
 hearingDifficulty = ukb.dropna(subset=["hearingDifficulty"])[["FID", "IID", "hearingDifficulty"]]
@@ -406,7 +408,7 @@ hearingDifficulty = ukb.dropna(subset=["hearingDifficulty"])[["FID", "IID", "hea
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2734
 childrenEverMothered_dict = {-3: np.nan}
 childrenEverMothered_cols = [col for col in ukb.columns if re.search("^2734-", col)]
-ukb[childrenEverMothered_cols] = ukb[childrenEverMothered_cols].applymap(lambda x: childrenEverMothered_dict.get(x))
+ukb[childrenEverMothered_cols] = ukb[childrenEverMothered_cols].applymap(lambda x: childrenEverMothered_dict.get(x,0))
 # use max observation as there shouldn't be inconsistencies
 ukb["childrenEverMothered"] = ukb[childrenEverMothered_cols].max(axis=1)
 childrenEverMothered = ukb.dropna(subset=["childrenEverMothered"])[["FID", "IID", "childrenEverMothered"]]
@@ -429,23 +431,45 @@ ukb["cad"] = ukb_cad.max(axis=1)
 cad = ukb.dropna(subset=["cad"])[["FID", "IID", "cad"]]
 del ukb_cad
 
-# WELL-BEING SPECTRUM 
-# https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=4526
-wellBeingSpectrum_dict = {1:6 , 2:5 , 3:4 ,4:3 ,5:2 ,6:1 }
-wellBeingSpectrum_cols = [col for col in ukb.columns if re.search("^4526-", col)]
-ukb[wellBeingSpectrum_cols] = ukb[wellBeingSpectrum_cols].applymap(lambda x: wellBeingSpectrum_dict.get(x))
-# use max observation as there shouldn't be inconsistencies
-ukb["wellBeingSpectrum"] = ukb[wellBeingSpectrum_cols].mean(axis=1)
-wellBeingSpectrum = ukb.dropna(subset=["wellBeingSpectrum"])[["FID", "IID", "wellBeingSpectrum"]]
+# COGNITIVE PERFORMANCE (ALSO DONE BY ANDRIES)
+# https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20016 
+cogPerformance_cols = [col for col in ukb.columns if re.search("^20016-", col)]
+# use mean observation as there shouldn't be inconsistencies
+ukb["cogPerformance"] = ukb[cogPerformance_cols].mean(axis=1)
+cogPerformance = ukb.dropna(subset=["cogPerformance"])[["FID", "IID", "cogPerformance"]]
 
 # POSITIVE AFFECT
-#
-
-# DEPRESSIVE SYMPTOMS 
-#
+# https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20458
+positiveAffect_dict = {1:6 , 2:5 , 3:4 ,4:3 ,5:2 ,6:1 }
+positiveAffect_cols = [col for col in ukb.columns if re.search("^20458-", col)]
+ukb[positiveAffect_cols] = ukb[positiveAffect_cols].applymap(lambda x: positiveAffect_dict.get(x, 0))
+# use max observation as there shouldn't be inconsistencies
+ukb["positiveAffect"] = ukb[positiveAffect_cols].mean(axis=1)
+positiveAffect = ukb.dropna(subset=["positiveAffect"])[["FID", "IID", "positiveAffect"]]
 
 # LIFE SATISFACION
-#
+# https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20460
+lifeSatisfaction_dict = {-818: np.nan , -121: np.nan}
+lifeSatisfaction_cols = [col for col in ukb.columns if re.search("^20458-", col)]
+ukb[lifeSatisfaction_cols] = ukb[lifeSatisfaction_cols].applymap(lambda x: lifeSatisfaction_dict.get(x, 0))
+# use max observation as there shouldn't be inconsistencies
+ukb["lifeSatisfaction"] = ukb[lifeSatisfaction_cols].mean(axis=1)
+lifeSatisfaction = ukb.dropna(subset=["lifeSatisfaction"])[["FID", "IID", "lifeSatisfaction"]]
+
+
+# WELL-BEING SPECTRUM
+# 
+#IMPORTANT NOTE: Based on Baselmand et. al. 2019 we 
+#contruct SWB spectrum as the sum of the variables neuroticism, 
+#positive affect, life satisfaction and depressive symptoms.*/ 
+
+# DEPRESSIVE SYMPTOMS 
+# 
+# https://www.sciencedirect.com/science/article/pii/S0022395619304388?casa_token=_LRo4DNexd8AAAAA:M4_Y5u4Yjcv0m215QLqB-gdabp38apin7oXdfXo1I4FYPVI-FMq9A76z5kFCr1ziohm4kgTrVWw
+
+
+# LACK OF PERSEVERANCE
+# 
 
 # write data
 dpw.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt", sep="\t", index=False, na_rep="NA")
@@ -486,4 +510,6 @@ hearingDifficulty.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/constru
 childrenEverMothered.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/childrenEverMothered/childrenEverMothered_pheno.txt", sep="\t", index=False, na_rep="NA")
 cancerProstate.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancerProstate/cancerProstate_pheno.txt", sep="\t", index=False, na_rep="NA")
 cad.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cad/cad_pheno.txt", sep="\t", index=False, na_rep="NA")
-wellBeingSpectrum.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/wellBeingSpectrum/wellBeingSpectrum_pheno.txt", sep="\t", index=False, na_rep="NA")
+cogPerformance.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cogPerformance/cogPerformance_pheno.txt", sep="\t", index=False, na_rep="NA")
+positiveAffect.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/positiveAffect/positiveAffect_pheno.txt", sep="\t", index=False, na_rep="NA")
+lifeSatisfaction.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/lifeSatisfaction/lifeSatisfaction_pheno.txt", sep="\t", index=False, na_rep="NA")
