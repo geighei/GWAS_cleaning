@@ -5,11 +5,11 @@ import re
 #### READ UKB DATA
 # del panel, non_missing
 ukb_cols = ["eid", 		# Individual ID
-			"31-0.0",	# Gender
-			"34-0.0", 	# Year of birth
-			"22006-0.0",# Genetic ethnic grouping
-			"22027-0.0",# Outliers for heterozygosity or missing rate
-			"22019-0.0",# Sex chromosome aneuploidy
+			"31",		# Gender
+			"34", 		# Year of birth
+			"22006",	# Genetic ethnic grouping
+			"22027",	# Outliers for heterozygosity or missing rate
+			"22019",	# Sex chromosome aneuploidy
 			"22009",	# Principal components
 			"1568", "1578", "1588", "1598", "1608", "5364",
 						# Drinks per week
@@ -55,12 +55,16 @@ ukb_cols = ["eid", 		# Individual ID
 			"20458",	# Positive Affect
 			"20460",	# Life Satisfaction	  	
 			"20016", 	# Cognitive Performance
+			"804", "904",		
+						# Moderate-to-vigorous physical activity
+			"2946", "1807", "1845", "3526"
+						# Parental longevity
 			]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
 ukb_iterator = pd.read_csv("/home/ubuntu/biroli/ukb/ukb23283.csv.gz", engine="python", encoding = "ISO-8859-1",
 					# keep only columns that regex match with our variables of interest since this is a 15GB file
-					usecols=lambda col: re.search("|".join(ukb_cols), col), chunksize=50000)
+					usecols=lambda col: re.search("^" + "-|^".join(ukb_cols) + "-", col), chunksize=50000)
 chunk_list = []
 for chunk in ukb_iterator:
 	chunk_list.append(chunk)
