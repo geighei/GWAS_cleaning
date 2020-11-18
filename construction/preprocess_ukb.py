@@ -471,9 +471,28 @@ lifeSatisfaction = ukb.dropna(subset=["lifeSatisfaction"])[["FID", "IID", "lifeS
 # 
 # https://www.sciencedirect.com/science/article/pii/S0022395619304388?casa_token=_LRo4DNexd8AAAAA:M4_Y5u4Yjcv0m215QLqB-gdabp38apin7oXdfXo1I4FYPVI-FMq9A76z5kFCr1ziohm4kgTrVWw
 
-
-# LACK OF PERSEVERANCE
-# 
+# AGE PARENTS 90TH
+ageParents_cols = [col for col in ukb.columns if re.search("^(2946|1807|1845|3526)-", col)]
+ukb_ageParents = ukb[ageParents_cols]
+# Combine father and mother's death and age columns to store one value for each
+ukb_ageParents["fatherDeath"] = ukb_ageParents.filter(regex="1807").max(axis=1)
+ukb_ageParents["motherDeath"] = ukb_ageParents.filter(regex="3526").max(axis=1)
+ukb_ageParents["fatherAge"] = ukb_ageParents.filter(regex="2946").max(axis=1)
+ukb_ageParents["motherAge"] = ukb_ageParents.filter(regex="1845").max(axis=1)
+# Calculate 90th percentile of death age for fathers and mothers separately, excluding Nan's
+(father90th, mother90th) = (np.nanpercentile(ukb_ageParents.fatherDeath, 90), np.nanpercentile(ukb_ageParents.motherDeath, 90))
+# Individuals marked for parental longevity trait if either mother or father died at or survived to an age >= 90th percentile
+ukb_ageParents["ageParents90th"] = 1*(
+	(ukb_ageParents.fatherDeath >= father90th) | 
+	(ukb_ageParents.motherDeath >= mother90th) |
+	(ukb_ageParents.fatherAge >= father90th)   |
+	(ukb_ageParents.motherAge >= mother90th))
+# NOTE: need to decide still whether we want this (Mark individuals for which we are uncertain as NaNs so they aren't included in GWAS)
+ukb["ageParents90th"] = \
+	np.where((ukb_ageParents.ageParents90th == 0) & 
+		(ukb_ageParents.fatherDeath.isnull() | ukb_ageParents.motherDeath.isnull()), 
+		np.nan, ukb_ageParents.ageParents90th)
+ageParents90th = ukb.dropna(subset=["ageparents90th"])[["FID", "IID", "ageParents90th"]]
 
 # write data
 dpw.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt", sep="\t", index=False, na_rep="NA")
@@ -517,3 +536,4 @@ cad.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cad/cad_
 cogPerformance.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cogPerformance/cogPerformance_pheno.txt", sep="\t", index=False, na_rep="NA")
 positiveAffect.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/positiveAffect/positiveAffect_pheno.txt", sep="\t", index=False, na_rep="NA")
 lifeSatisfaction.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/lifeSatisfaction/lifeSatisfaction_pheno.txt", sep="\t", index=False, na_rep="NA")
+ageParents90th.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ageParents90th/ageParents90th_pheno.txt", sep="\t", index=False, na_rep="NA")
