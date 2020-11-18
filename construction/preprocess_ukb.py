@@ -59,6 +59,8 @@ ukb_cols = ["eid", 		# Individual ID
 						# Moderate-to-vigorous physical activity
 			"2946", "1807", "1845", "3526"
 						# Parental longevity
+			"20514", "20510", "20517" , "20519", "20511", "20507", "20508", "20518", "20513"      
+						# Depressive symptoms
 			]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
@@ -460,16 +462,26 @@ ukb[lifeSatisfaction_cols] = ukb[lifeSatisfaction_cols].applymap(lambda x: lifeS
 ukb["lifeSatisfaction"] = ukb[lifeSatisfaction_cols].mean(axis=1)
 lifeSatisfaction = ukb.dropna(subset=["lifeSatisfaction"])[["FID", "IID", "lifeSatisfaction"]]
 
+# DEPRESSIVE SYMPTOMS 
+# https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20447
+# https://onlinelibrary.wiley.com/doi/full/10.1046/j.1525-1497.2001.016009606.x
+depressScore_dict = {-818: np.nan, 1:0, 2:1, 3:2, 4:3  }
+depressScore_cols = [col for col in ukb.columns if re.search("^(20514|20510|20517|20519|20511|20507|20508|20518|20513)-", col)]
+ukb[depressScore_cols] = ukb[depressScore_cols].applymap(lambda x: depressScore_dict.get(x, 0))
+# Subset the columns
+ukb_depressScore = ukb[depressScore_cols]
+# Sum all scores 
+sum_column = ukb_depressScore["20514"] + ukb_depressScore["20510"]+ ukb_depressScore["20517"] + ukb_depressScore["20519"]+ ukb_depressScore["20511"]+ ukb_depressScore["20507"]+ ukb_depressScore["20508"]+ ukb_depressScore["20518"]+ ukb_depressScore["20513"] 
+ukb_depressScore["depressScore"] = sum_column
+# append a new column?
+ukb["depressScore"] = ukb_depressScore["depressScore"]
+depressScore = ukb.dropna(subset=["depressScore"])[["FID", "IID", "depressScore"]]
 
 # WELL-BEING SPECTRUM
 # 
-#IMPORTANT NOTE: Based on Baselmand et. al. 2019 we 
-#contruct SWB spectrum as the sum of the variables neuroticism, 
-#positive affect, life satisfaction and depressive symptoms.*/ 
+ukb["wellBeingSpectrum"] = ukb["depressScore"] + ukb["lifeSatisfaction"] + ukb["positiveAffect"] + ukb["neuroticism"]
+wellBeingSpectrum = ukb.dropna(subset=["wellBeingSpectrum"])[["FID", "IID", "wellBeingSpectrum"]]
 
-# DEPRESSIVE SYMPTOMS 
-# 
-# https://www.sciencedirect.com/science/article/pii/S0022395619304388?casa_token=_LRo4DNexd8AAAAA:M4_Y5u4Yjcv0m215QLqB-gdabp38apin7oXdfXo1I4FYPVI-FMq9A76z5kFCr1ziohm4kgTrVWw
 
 # AGE PARENTS 90TH
 ageParents_cols = [col for col in ukb.columns if re.search("^(2946|1807|1845|3526)-", col)]
