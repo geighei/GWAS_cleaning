@@ -4,8 +4,7 @@ import re
 
 #### READ UKB DATA
 # del panel, non_missing
-ukb_cols = ["eid", 		# Individual ID
-			"31",		# Gender
+ukb_cols = ["31",		# Gender
 			"34", 		# Year of birth
 			"22006",	# Genetic ethnic grouping
 			"22027",	# Outliers for heterozygosity or missing rate
@@ -55,9 +54,9 @@ ukb_cols = ["eid", 		# Individual ID
 			"20458",	# Positive Affect
 			"20460",	# Life Satisfaction	  	
 			"20016", 	# Cognitive Performance
-			"804", "904",		
+			"884", "904",		
 						# Moderate-to-vigorous physical activity
-			"2946", "1807", "1845", "3526"
+			"2946", "1807", "1845", "3526",
 						# Parental longevity
 			"20514", "20510", "20517" , "20519", "20511", "20507", "20508", "20518", "20513"      
 						# Depressive symptoms
@@ -66,7 +65,7 @@ ukb_cols = ["eid", 		# Individual ID
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
 ukb_iterator = pd.read_csv("/home/ubuntu/biroli/ukb/ukb23283.csv.gz", engine="python", encoding = "ISO-8859-1",
 					# keep only columns that regex match with our variables of interest since this is a 15GB file
-					usecols=lambda col: re.search("^" + "-|^".join(ukb_cols) + "-", col), chunksize=50000)
+					usecols=lambda col: re.search("eid|^" + "-|^".join(ukb_cols) + "-", col), chunksize=50000)
 chunk_list = []
 for chunk in ukb_iterator:
 	chunk_list.append(chunk)
@@ -440,48 +439,45 @@ del ukb_cad
 # COGNITIVE PERFORMANCE (ALSO DONE BY ANDRIES)
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20016 
 cogPerformance_cols = [col for col in ukb.columns if re.search("^20016-", col)]
-# use mean observation as there shouldn't be inconsistencies
+# use mean cognitive performance as measure 
 ukb["cogPerformance"] = ukb[cogPerformance_cols].mean(axis=1)
 cogPerformance = ukb.dropna(subset=["cogPerformance"])[["FID", "IID", "cogPerformance"]]
 
 # POSITIVE AFFECT
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20458
-positiveAffect_dict = {1:6 , 2:5 , 3:4 ,4:3 ,5:2 ,6:1 }
+positiveAffect_dict = {1:6, 2:5, 3:4, 4:3, 5:2, 6:1}
 positiveAffect_cols = [col for col in ukb.columns if re.search("^20458-", col)]
-ukb[positiveAffect_cols] = ukb[positiveAffect_cols].applymap(lambda x: positiveAffect_dict.get(x, 0))
-# use max observation as there shouldn't be inconsistencies
+ukb[positiveAffect_cols] = ukb[positiveAffect_cols].applymap(lambda x: positiveAffect_dict.get(x))
+# use mean to avoid over-weighting time of particular observation
 ukb["positiveAffect"] = ukb[positiveAffect_cols].mean(axis=1)
 positiveAffect = ukb.dropna(subset=["positiveAffect"])[["FID", "IID", "positiveAffect"]]
 
 # LIFE SATISFACION
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20460
 lifeSatisfaction_dict = {-818: np.nan , -121: np.nan}
-lifeSatisfaction_cols = [col for col in ukb.columns if re.search("^20458-", col)]
-ukb[lifeSatisfaction_cols] = ukb[lifeSatisfaction_cols].applymap(lambda x: lifeSatisfaction_dict.get(x, 0))
-# use max observation as there shouldn't be inconsistencies
+lifeSatisfaction_cols = [col for col in ukb.columns if re.search("^20460-", col)]
+ukb[lifeSatisfaction_cols] = ukb[lifeSatisfaction_cols].applymap(lambda x: lifeSatisfaction_dict.get(x, x))
+# use mean to avoid over-weighting time of particular observation
 ukb["lifeSatisfaction"] = ukb[lifeSatisfaction_cols].mean(axis=1)
 lifeSatisfaction = ukb.dropna(subset=["lifeSatisfaction"])[["FID", "IID", "lifeSatisfaction"]]
 
 # DEPRESSIVE SYMPTOMS 
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20447
 # https://onlinelibrary.wiley.com/doi/full/10.1046/j.1525-1497.2001.016009606.x
-depressScore_dict = {-818: np.nan, 1:0, 2:1, 3:2, 4:3  }
+depressScore_dict = {1:0, 2:1, 3:2, 4:3}
 depressScore_cols = [col for col in ukb.columns if re.search("^(20514|20510|20517|20519|20511|20507|20508|20518|20513)-", col)]
-ukb[depressScore_cols] = ukb[depressScore_cols].applymap(lambda x: depressScore_dict.get(x, 0))
-# Subset the columns
+# Subset the columns and standardize so no days of depressive symptomize is 0
 ukb_depressScore = ukb[depressScore_cols]
+ukb_depressScore = ukb_depressScore.applymap(lambda x: depressScore_dict.get(x))
 # Sum all scores 
-sum_column = ukb_depressScore["20514"] + ukb_depressScore["20510"]+ ukb_depressScore["20517"] + ukb_depressScore["20519"]+ ukb_depressScore["20511"]+ ukb_depressScore["20507"]+ ukb_depressScore["20508"]+ ukb_depressScore["20518"]+ ukb_depressScore["20513"] 
-ukb_depressScore["depressScore"] = sum_column
-# append a new column?
-ukb["depressScore"] = ukb_depressScore["depressScore"]
+ukb["depressScore"] = ukb_depressScore.sum(axis=1)
 depressScore = ukb.dropna(subset=["depressScore"])[["FID", "IID", "depressScore"]]
+del ukb_depressScore
 
 # WELL-BEING SPECTRUM
 # 
-ukb["wellBeingSpectrum"] = ukb["depressScore"] + ukb["lifeSatisfaction"] + ukb["positiveAffect"] + ukb["neuroticism"]
+ukb["wellBeingSpectrum"] = ukb["depressScore"] + ukb["lifeSatisfaction"] + ukb["positiveAffect"] + ukb["neuroticismScore"]
 wellBeingSpectrum = ukb.dropna(subset=["wellBeingSpectrum"])[["FID", "IID", "wellBeingSpectrum"]]
-
 
 # AGE PARENTS 90TH
 ageParents_cols = [col for col in ukb.columns if re.search("^(2946|1807|1845|3526)-", col)]
@@ -504,7 +500,12 @@ ukb["ageParents90th"] = \
 	np.where((ukb_ageParents.ageParents90th == 0) & 
 		(ukb_ageParents.fatherDeath.isnull() | ukb_ageParents.motherDeath.isnull()), 
 		np.nan, ukb_ageParents.ageParents90th)
-ageParents90th = ukb.dropna(subset=["ageparents90th"])[["FID", "IID", "ageParents90th"]]
+ageParents = ukb.dropna(subset=["ageparents90th"])[["FID", "IID", "ageParents90th"]]
+del ukb_ageParents
+
+# MODERATE TO VIGOROUS PHYSICAL ACTIVITY
+actModVig_cols = [col for col in ukb.columns if re.search("^(884|904)-")]
+
 
 # write data
 dpw.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt", sep="\t", index=False, na_rep="NA")
@@ -548,4 +549,6 @@ cad.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cad/cad_
 cogPerformance.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cogPerformance/cogPerformance_pheno.txt", sep="\t", index=False, na_rep="NA")
 positiveAffect.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/positiveAffect/positiveAffect_pheno.txt", sep="\t", index=False, na_rep="NA")
 lifeSatisfaction.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/lifeSatisfaction/lifeSatisfaction_pheno.txt", sep="\t", index=False, na_rep="NA")
-ageParents90th.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ageParents90th/ageParents90th_pheno.txt", sep="\t", index=False, na_rep="NA")
+depressScore.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/depressScore/depressScore_pheno.txt", sep="\t", index=False, na_rep="NA")
+wellBeingSpectrum.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/wellBeingSpectrum/wellBeingSpectrum_pheno.txt", sep="\t", index=False, na_rep="NA")
+ageParents.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ageParents90th/ageParents90th_pheno.txt", sep="\t", index=False, na_rep="NA")
