@@ -475,9 +475,19 @@ depressScore = ukb.dropna(subset=["depressScore"])[["FID", "IID", "depressScore"
 del ukb_depressScore
 
 # WELL-BEING SPECTRUM
-# 
-ukb["wellBeingSpectrum"] = ukb["depressScore"] + ukb["lifeSatisfaction"] + ukb["positiveAffect"] + ukb["neuroticismScore"]
+ukb_wbSpectrum = ukb[["lifeSatisfaction","positiveAffect","neuroticismScore","depressScore"]]
+ukb_wbSpectrum_sd = ukb_wbSpectrum.apply(lambda x: (x-x.mean())/x.std())
+# would like to use this approach but pandas has an eggregious bug that ignores axis argument
+#ukb_wbSpectrum_sd.fillna(value=0, axis=1, limit=1, inplace=True)
+ukb_wbSpectrum_sd["nanCount"] = ukb_wbSpectrum_sd.isna().sum(axis=1)
+ukb_wbSpectrum_sd.fillna(value=0, inplace=True)
+# Take average of normalized wbSpectrum scores, negating neuroticism and depression so they're "positive"
+ukb_wbSpectrum_sd["wellBeingSpectrum"] = (
+	ukb_wbSpectrum_sd.lifeSatisfaction + ukb_wbSpectrum_sd.positiveAffect - 
+	ukb_wbSpectrum_sd.neuroticismScore - ukb_wbSpectrum_sd.depressScore) / 4
+ukb["wellBeingSpectrum"] = np.where(ukb_wbSpectrum_sd.nanCount >= 2, np.nan, ukb_wbSpectrum_sd.wellBeingSpectrum)
 wellBeingSpectrum = ukb.dropna(subset=["wellBeingSpectrum"])[["FID", "IID", "wellBeingSpectrum"]]
+del ukb_wbSpectrum, ukb_wbSpectrum_sd
 
 # AGE PARENTS 90TH
 ageParents_cols = [col for col in ukb.columns if re.search("^(2946|1807|1845|3526)-", col)]
