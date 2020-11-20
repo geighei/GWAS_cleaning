@@ -42,7 +42,7 @@ ukb_cols = ["31",		# Gender
 			"2000",		# Feeling Worry
 			"40006",	# Breast Cancer		
 			"30690",	# Cholesterol
-			"6150"		# Stroke
+			"6150",		# Stroke
 			"2405", 	# Number of children fathered (male) 
 			"2453",		# Cancer
 			"2040",		# Risk taking behaviour
@@ -174,7 +174,7 @@ smokeInit = ukb.dropna(subset=["smokeInit"])[["FID", "IID", "smokeInit"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=21001
 bmi_cols = [col for col in ukb.columns if re.search("^21001-", col)]
 # use first available observation, for vast majority this is initial assessment
-ukb["bmi"] = ukb[bmi_cols].mean(axis=1).iloc[:, 0]
+ukb["bmi"] = ukb[bmi_cols].mean(axis=1)
 bmi = ukb.dropna(subset=["bmi"])[["FID", "IID", "bmi"]]
 
 # SMOKING CESSATION
@@ -315,7 +315,7 @@ neuroticismScore = ukb.dropna(subset=["neuroticismScore"])[["FID", "IID", "neuro
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2000
 worryFeeling_dict = {-1: np.nan, -3: np.nan}
 worryFeeling_cols = [col for col in ukb.columns if re.search("^2000-", col)]
-ukb[worryFeeling_cols] = ukb[worryFeeling_cols].applymap(lambda x: worryFeeling_dict.get(x,0))
+ukb[worryFeeling_cols] = ukb[worryFeeling_cols].applymap(lambda x: worryFeeling_dict.get(x,x))
 # use fist available observation as there shouldn't be inconsistencies
 ukb["worryFeeling"] = ukb[worryFeeling_cols].max(axis=1)
 worryFeeling = ukb.dropna(subset=["worryFeeling"])[["FID", "IID", "worryFeeling"]]
@@ -510,7 +510,7 @@ ukb["ageParents90th"] = \
 	np.where((ukb_ageParents.ageParents90th == 0) & 
 		(ukb_ageParents.fatherDeath.isnull() | ukb_ageParents.motherDeath.isnull()), 
 		np.nan, ukb_ageParents.ageParents90th)
-ageParents = ukb.dropna(subset=["ageparents90th"])[["FID", "IID", "ageParents90th"]]
+ageParents = ukb.dropna(subset=["ageParents90th"])[["FID", "IID", "ageParents90th"]]
 del ukb_ageParents
 
 # MODERATE TO VIGOROUS PHYSICAL ACTIVITY
@@ -529,13 +529,14 @@ for reg in ["894", "914"]:
 # Weight moderate and vigorous exercise according to MVPA GWAS
 ukb["actModVig"] = 4*ukb_actModVig.new894 + 8*ukb_actModVig.new914
 actModVig = ukb.dropna(subset=["actModVig"])[["FID", "IID", "actModVig"]]
+del ukb_actModVig
 
 # write data
 dpw.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt", sep="\t", index=False, na_rep="NA")
 educ.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/educYears/educYears_pheno.txt", sep="\t", index=False, na_rep="NA")
 householdIncome.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/householdIncome/householdIncome_pheno.txt", sep="\t", index=False, na_rep="NA")
 health.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/healthRating/healthRating_pheno.txt", sep="\t", index=False, na_rep="NA")
-maxcpd.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/maxmaxcpd/maxmaxcpd_pheno.txt", sep="\t", index=False, na_rep="NA")
+maxcpd.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/maxcpd/maxcpd_pheno.txt", sep="\t", index=False, na_rep="NA")
 ageFirstBirth.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ageFirstBirth/ageFirstBirth_pheno.txt", sep="\t", index=False, na_rep="NA")
 smokeInit.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/smokeInit/smokeInit_pheno.txt", sep="\t", index=False, na_rep="NA")
 bmi.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/bmi/bmi_pheno.txt", sep="\t", index=False, na_rep="NA")
