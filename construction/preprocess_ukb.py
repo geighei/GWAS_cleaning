@@ -217,7 +217,7 @@ memoryTest = ukb.dropna(subset=["memoryTest"])[["FID", "IID", "memoryTest"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
 highBloodPressure_dict = {4: 1, -3: np.nan}
 highBloodPressure_cols = [col for col in ukb.columns if re.search("^6150-", col)]
-ukb[highBloodPressure_cols] = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x,0))
+ukb[highBloodPressure_cols] = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x,x))
 # use maximum to maintain consistency across individuals since it's binary
 ukb["highBloodPressure"] = ukb[highBloodPressure_cols].max(axis=1)
 highBloodPressure = ukb.dropna(subset=["highBloodPressure"])[["FID", "IID", "highBloodPressure"]]
@@ -233,7 +233,7 @@ medsTaken = ukb.dropna(subset=["medsTaken"])[["FID", "IID", "medsTaken"]]
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2020 
 loneliness_dict = {-1: np.nan, -3: np.nan}
 loneliness_cols = [col for col in ukb.columns if re.search("^2020-", col)]
-ukb[loneliness_cols] = ukb[loneliness_cols].applymap(lambda x: loneliness_dict.get(x,0))
+ukb[loneliness_cols] = ukb[loneliness_cols].applymap(lambda x: loneliness_dict.get(x,x))
 # use first available observation as there shouldn't be inconsistencies
 ukb["loneliness"] = ukb[loneliness_cols].max(axis=1)
 loneliness = ukb.dropna(subset=["loneliness"])[["FID", "IID", "loneliness"]]
@@ -260,7 +260,7 @@ depress = ukb.dropna(subset=["depress"])[["FID", "IID", "depress"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=1200
 insomniaFrequent_dict = {-3: np.nan}
 insomniaFrequent_cols = [col for col in ukb.columns if re.search("^1200-", col)]
-ukb[insomniaFrequent_cols] = ukb[insomniaFrequent_cols].applymap(lambda x: insomniaFrequent_dict.get(x,0))
+ukb[insomniaFrequent_cols] = ukb[insomniaFrequent_cols].applymap(lambda x: insomniaFrequent_dict.get(x,x))
 # use max observation as there shouldn't be inconsistencies
 ukb["insomniaFrequent"] = ukb[insomniaFrequent_cols].max(axis=1)
 insomniaFrequent = ukb.dropna(subset=["insomniaFrequent"])[["FID", "IID", "insomniaFrequent"]]
@@ -285,7 +285,7 @@ nonCancerIllness = ukb.dropna(subset=["nonCancerIllness"])[["FID", "IID", "nonCa
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20421
 anxiety_dict = {-818: np.nan, -121: np.nan}
 anxiety_cols = [col for col in ukb.columns if re.search("^20421-", col)]
-ukb[anxiety_cols] = ukb[anxiety_cols].applymap(lambda x: anxiety_dict.get(x,0))
+ukb[anxiety_cols] = ukb[anxiety_cols].applymap(lambda x: anxiety_dict.get(x,x))
 # use fist available observation as there shouldn't be inconsistencies
 ukb["anxiety"] = ukb[anxiety_cols].max(axis=1)
 anxiety = ukb.dropna(subset=["anxiety"])[["FID", "IID", "anxiety"]]
@@ -340,7 +340,7 @@ totChol = ukb.dropna(subset=["totChol"])[["FID", "IID", "totChol"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
 stroke_dict = {1:0, 3:1}
 stroke_cols = [col for col in ukb.columns if re.search("^6150-", col)]
-ukb[stroke_cols] = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, 0))
+ukb[stroke_cols] = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, x))
 # use max observation
 ukb["stroke"] = ukb[stroke_cols].max(axis=1)
 stroke = ukb.dropna(subset=["stroke"])[["FID", "IID", "stroke"]]
@@ -413,7 +413,7 @@ hearingDifficulty = ukb.dropna(subset=["hearingDifficulty"])[["FID", "IID", "hea
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2734
 childrenEverMothered_dict = {-3: np.nan}
 childrenEverMothered_cols = [col for col in ukb.columns if re.search("^2734-", col)]
-ukb[childrenEverMothered_cols] = ukb[childrenEverMothered_cols].applymap(lambda x: childrenEverMothered_dict.get(x,0))
+ukb[childrenEverMothered_cols] = ukb[childrenEverMothered_cols].applymap(lambda x: childrenEverMothered_dict.get(x,x))
 # use max observation as there shouldn't be inconsistencies
 ukb["childrenEverMothered"] = ukb[childrenEverMothered_cols].max(axis=1)
 childrenEverMothered = ukb.dropna(subset=["childrenEverMothered"])[["FID", "IID", "childrenEverMothered"]]
