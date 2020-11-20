@@ -54,7 +54,7 @@ ukb_cols = ["31",		# Gender
 			"20458",	# Positive Affect
 			"20460",	# Life Satisfaction	  	
 			"20016", 	# Cognitive Performance
-			"884", "904",		
+			"894", "914", #"884", "904",		
 						# Moderate-to-vigorous physical activity
 			"2946", "1807", "1845", "3526",
 						# Parental longevity
@@ -514,8 +514,21 @@ ageParents = ukb.dropna(subset=["ageparents90th"])[["FID", "IID", "ageParents90t
 del ukb_ageParents
 
 # MODERATE TO VIGOROUS PHYSICAL ACTIVITY
-actModVig_cols = [col for col in ukb.columns if re.search("^(884|904)-")]
-
+actModVig_cols = [col for col in ukb.columns if re.search("^(894|914)-", col)]
+# -1 and -3 code missing values; NANs code individuals that reported less than 1 day of 10 min. exercise
+ukb_actModVig = ukb[actModVig_cols].fillna(0).replace(to_replace=[-1,-3], value=np.nan)
+# For each moderate and vigorous column sets
+for reg in ["894", "914"]:
+	col_name = "new"+reg
+	df = ukb_actModVig.filter(regex=reg)
+	# First calculate first non-missing, non-zero value of each row
+	col = df.replace(0, np.nan).bfill(1).iloc[:,0]
+	# Then, if still missing, set to zero if first value is missing (not -1 or -3)
+	# and multiply by 7 to get in min/week instead of min/day
+	ukb_actModVig[col_name] = np.where(pd.isnull(col) & (df.iloc[:,0] == 0), 0, 7 * col)
+# Weight moderate and vigorous exercise according to MVPA GWAS
+ukb["actModVig"] = 4*ukb_actModVig.new894 + 8*ukb_actModVig.new914
+actModVig = ukb.dropna(subset=["actModVig"])[["FID", "IID", "actModVig"]]
 
 # write data
 dpw.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt", sep="\t", index=False, na_rep="NA")
@@ -562,3 +575,4 @@ lifeSatisfaction.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construc
 depressScore.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/depressScore/depressScore_pheno.txt", sep="\t", index=False, na_rep="NA")
 wellBeingSpectrum.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/wellBeingSpectrum/wellBeingSpectrum_pheno.txt", sep="\t", index=False, na_rep="NA")
 ageParents.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ageParents90th/ageParents90th_pheno.txt", sep="\t", index=False, na_rep="NA")
+actModVig.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/actModVig/actModVig_pheno.txt", sep="\t", index=False, na_rep="NA")
