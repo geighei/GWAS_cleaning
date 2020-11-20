@@ -215,7 +215,7 @@ memoryTest = ukb.dropna(subset=["memoryTest"])[["FID", "IID", "memoryTest"]]
 
 # HIGH BLOOD PRESSURE
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
-highBloodPressure_dict = { 1: 0, 2: 0, 3: 0, -3: np.nan, -7: 0}
+highBloodPressure_dict = {4: 1, -3: np.nan}
 highBloodPressure_cols = [col for col in ukb.columns if re.search("^6150-", col)]
 ukb[highBloodPressure_cols] = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x,0))
 # use maximum to maintain consistency across individuals since it's binary
@@ -349,7 +349,7 @@ stroke = ukb.dropna(subset=["stroke"])[["FID", "IID", "stroke"]]
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2405
 childrenEverFathered_dict = {-1: np.nan, -3: np.nan}
 childrenEverFathered_cols = [col for col in ukb.columns if re.search("^2405-", col)]
-ukb[childrenEverFathered_cols] = ukb[childrenEverFathered_cols].applymap(lambda x: childrenEverFathered_dict.get(x,0))
+ukb[childrenEverFathered_cols] = ukb[childrenEverFathered_cols].applymap(lambda x: childrenEverFathered_dict.get(x,x))
 # use max observation as there shouldn't be inconsistencies
 ukb["childrenEverFathered"] = ukb[childrenEverFathered_cols].max(axis=1)
 childrenEverFathered = ukb.dropna(subset=["childrenEverFathered"])[["FID", "IID", "childrenEverFathered"]]
