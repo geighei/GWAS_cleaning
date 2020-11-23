@@ -3,7 +3,6 @@ import numpy as np
 import re
 
 #### READ UKB DATA
-# del panel, non_missing
 ukb_cols = ["31",		# Gender
 			"34", 		# Year of birth
 			"22006",	# Genetic ethnic grouping
@@ -217,7 +216,7 @@ memoryTest = ukb.dropna(subset=["memoryTest"])[["FID", "IID", "memoryTest"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
 highBloodPressure_dict = {4: 1, -3: np.nan}
 highBloodPressure_cols = [col for col in ukb.columns if re.search("^6150-", col)]
-ukb[highBloodPressure_cols] = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x,x))
+ukb[highBloodPressure_cols] = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x,0))
 # use maximum to maintain consistency across individuals since it's binary
 ukb["highBloodPressure"] = ukb[highBloodPressure_cols].max(axis=1)
 highBloodPressure = ukb.dropna(subset=["highBloodPressure"])[["FID", "IID", "highBloodPressure"]]
@@ -242,7 +241,7 @@ loneliness = ukb.dropna(subset=["loneliness"])[["FID", "IID", "loneliness"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20116
 smokeInit_dict = {-3: np.nan, 2: 1}
 smokeInit_cols = [col for col in ukb.columns if re.search("^20116-", col)]
-ukb[smokeInit_cols] = ukb[smokeInit_cols].applymap(lambda x: smokeInit_dict.get(x,0))
+ukb[smokeInit_cols] = ukb[smokeInit_cols].applymap(lambda x: smokeInit_dict.get(x,x))
 # use last available observation as there shouldn't be inconsistencies
 ukb["smokeInit"] = ukb[smokeInit_cols].ffill(axis=1).iloc[:,0]
 smokeInit = ukb.dropna(subset=["smokeInit"])[["FID", "IID", "smokeInit"]]
@@ -338,9 +337,9 @@ totChol = ukb.dropna(subset=["totChol"])[["FID", "IID", "totChol"]]
 
 # STROKE
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
-stroke_dict = {1:0, 3:1}
+stroke_dict = {-3: np.nan, 3: 1}
 stroke_cols = [col for col in ukb.columns if re.search("^6150-", col)]
-ukb[stroke_cols] = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, x))
+ukb[stroke_cols] = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, 0))
 # use max observation
 ukb["stroke"] = ukb[stroke_cols].max(axis=1)
 stroke = ukb.dropna(subset=["stroke"])[["FID", "IID", "stroke"]]
