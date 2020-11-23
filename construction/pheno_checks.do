@@ -11,8 +11,8 @@ if "`c(username)'" == "parceh" {
 	log using "${DIR}/pheno_checks_`logdate'.log", replace
 
 
-global PHENOS height educYears bmi neuroticismScore worryFeeling risk loneliness insomniaFrequent  depress anxiety  dpw  arthritis t2d ageFirstBirth totChol maxCPD smokeInit cesSmoke cancerBreast cancerProstate  asthma householdIncome cancer cataract cad hearingDifficulty highBloodPressure  medsTaken  childrenEverFathered childrenEverMothered healthRating stroke wellBeingSpectrum t1d  memoryTest
-*actModVig cogPerformance lifeSatisfaction depressScore ageParents90th ageSmoke alzheimer perseveranceLack  nonCancerIllness
+global PHENOS height educYears bmi neuroticismScore worryFeeling risk loneliness insomniaFrequent  depress anxiety  dpw  arthritis t2d ageFirstBirth totChol maxCPD smokeInit cesSmoke cancerBreast cancerProstate  asthma householdIncome cancer cataract cad hearingDifficulty highBloodPressure  medsTaken  childrenEverFathered childrenEverMothered healthRating stroke wellBeingSpectrum t1d  memoryTest actModVig cogPerformance lifeSatisfaction depressScore ageParents90th alzheimer   nonCancerIllness
+*ageParents90th aperseveranceLack  
 
 *global PHENOS memoryTest
 
@@ -24,7 +24,7 @@ set trace off
 foreach i in $PHENOS {
 clear
 import delimited using "$DIR/`i'/`i'_pheno.txt"
-
+/*
 	if "`i'" == "ageFirstBirth" {
 	local newvar = lower("`i'")
 	rename afb `newvar'
@@ -45,7 +45,7 @@ import delimited using "$DIR/`i'/`i'_pheno.txt"
 	
 	}
 	
-
+*/
 local newvar = lower("`i'")
 capture confirm variable  `newvar'
 if !_rc {
