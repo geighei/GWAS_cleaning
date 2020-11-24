@@ -2,7 +2,7 @@
 shopt -s extglob
 
 # Example usage: 
-# ./single_pheno_regenie.sh --gwas /home/ubuntu/biroli/geighei/data/GWAS_sumstats 
+# ./single_pheno_regenie.sh --dir /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction
 # --bed /home/ubuntu/UKB/genomeclean/ukb_non_imputed_best_guess_QC 
 # --bgen1 /home/ubuntu/UKB/imputed/ukb_imp_chr --bgen2 _v3.bgen 
 # --sample1 /home/ubuntu/UKB/genomeraw/ukb41382_imp_chr --sample2 _v3_s487330.sample 

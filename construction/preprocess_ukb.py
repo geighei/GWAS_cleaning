@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import re
+import os
 
 #### READ UKB DATA
 ukb_cols = ["31",		# Gender
@@ -60,6 +61,7 @@ ukb_cols = ["31",		# Gender
 			"20514", "20510", "20517" , "20519", "20511", "20507", "20508", "20518", "20513"      
 						# Depressive symptoms
 			]
+construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction"
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
 ukb_iterator = pd.read_csv("/home/ubuntu/biroli/ukb/ukb23283.csv.gz", engine="python", encoding = "ISO-8859-1",
@@ -83,7 +85,7 @@ ukb.insert(0, "IID", ukb.eid)
 ukb.insert(0, "FID", ukb.eid)
 # covariates are gender, year of birth, and first 20 principal components
 covar_cols = [col for col in ukb.columns if re.search("^(FID|IID|31-0\.0|34-0\.0|22009-0\.([1-9]$|1[0-9]|20))", col)]
-ukb[covar_cols].to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ukb_covars.txt", sep="\t", index=False, na_rep="NA")
+ukb[covar_cols].to_csv(os.path.join(construction_fp, "ukb_covars.txt") sep="\t", index=False, na_rep="NA")
 
 # set of columns to use for all self-reported diagnoses
 diagnosis_cols = [col for col in ukb.columns if re.search("^4120(2|4)-", col)]
@@ -531,48 +533,48 @@ actModVig = ukb.dropna(subset=["actModVig"])[["FID", "IID", "actModVig"]]
 del ukb_actModVig
 
 # write data
-dpw.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/dpw_pheno.txt", sep="\t", index=False, na_rep="NA")
-educ.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/educYears/educYears_pheno.txt", sep="\t", index=False, na_rep="NA")
-householdIncome.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/householdIncome/householdIncome_pheno.txt", sep="\t", index=False, na_rep="NA")
-health.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/healthRating/healthRating_pheno.txt", sep="\t", index=False, na_rep="NA")
-maxcpd.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/maxcpd/maxcpd_pheno.txt", sep="\t", index=False, na_rep="NA")
-ageFirstBirth.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ageFirstBirth/ageFirstBirth_pheno.txt", sep="\t", index=False, na_rep="NA")
-smokeInit.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/smokeInit/smokeInit_pheno.txt", sep="\t", index=False, na_rep="NA")
-bmi.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/bmi/bmi_pheno.txt", sep="\t", index=False, na_rep="NA")
-cesSmoke.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cesSmoke/cesSmoke_pheno.txt", sep="\t", index=False, na_rep="NA")
-t2d.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/t2d/t2d_pheno.txt", sep="\t", index=False, na_rep="NA")
-t1d.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/t1d/t1d_pheno.txt", sep="\t", index=False, na_rep="NA")
-memoryTest.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/memoryTest/memoryTest_pheno.txt", sep="\t", index=False, na_rep="NA")
-highBloodPressure.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/highBloodPressure/highBloodPressure_pheno.txt", sep="\t", index=False, na_rep="NA")
-medsTaken.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/medsTaken/medsTaken_pheno.txt", sep="\t", index=False, na_rep="NA")
-loneliness.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/loneliness/loneliness_pheno.txt", sep="\t", index=False, na_rep="NA")
-smokeInit.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/smokeInit/smokeInit_pheno.txt", sep="\t", index=False, na_rep="NA")
-depress.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/depress/depress_pheno.txt", sep="\t", index=False, na_rep="NA")
-insomniaFrequent.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/insomniaFrequent/insomniaFrequent_pheno.txt", sep="\t", index=False, na_rep="NA")
-arthritis.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/arthritis/arthritis_pheno.txt", sep="\t", index=False, na_rep="NA")
-nonCancerIllness.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/nonCancerIllness/nonCancerIllness_pheno.txt", sep="\t", index=False, na_rep="NA")
-anxiety.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/anxiety/anxiety_pheno.txt", sep="\t", index=False, na_rep="NA")
-height.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/height/height_pheno.txt", sep="\t", index=False, na_rep="NA")
-asthma.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/asthma/asthma_pheno.txt", sep="\t", index=False, na_rep="NA")
-neuroticismScore.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/neuroticismScore/neuroticismScore_pheno.txt", sep="\t", index=False, na_rep="NA")
-worryFeeling.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/worryFeeling/worryFeeling_pheno.txt", sep="\t", index=False, na_rep="NA")
-cancerBreast.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancerBreast/cancerBreast_pheno.txt", sep="\t", index=False, na_rep="NA")
-totChol.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/totChol/totChol_pheno.txt", sep="\t", index=False, na_rep="NA")
-stroke.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/stroke/stroke_pheno.txt", sep="\t", index=False, na_rep="NA")
-childrenEverFathered.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/childrenEverFathered/childrenEverFathered_pheno.txt", sep="\t", index=False, na_rep="NA")
-obesitySevere.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/obesitySevere/obesitySevere_pheno.txt", sep="\t", index=False, na_rep="NA")
-cancer.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancer/cancer_pheno.txt", sep="\t", index=False, na_rep="NA")
-risk.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/risk/risk_pheno.txt", sep="\t", index=False, na_rep="NA")
-alzheimer.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/alzheimer/alzheimer_pheno.txt", sep="\t", index=False, na_rep="NA")
-cataract.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cataract/cataract_pheno.txt", sep="\t", index=False, na_rep="NA")
-hearingDifficulty.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/hearingDifficulty/hearingDifficulty_pheno.txt", sep="\t", index=False, na_rep="NA")
-childrenEverMothered.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/childrenEverMothered/childrenEverMothered_pheno.txt", sep="\t", index=False, na_rep="NA")
-cancerProstate.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cancerProstate/cancerProstate_pheno.txt", sep="\t", index=False, na_rep="NA")
-cad.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cad/cad_pheno.txt", sep="\t", index=False, na_rep="NA")
-cogPerformance.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/cogPerformance/cogPerformance_pheno.txt", sep="\t", index=False, na_rep="NA")
-positiveAffect.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/positiveAffect/positiveAffect_pheno.txt", sep="\t", index=False, na_rep="NA")
-lifeSatisfaction.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/lifeSatisfaction/lifeSatisfaction_pheno.txt", sep="\t", index=False, na_rep="NA")
-depressScore.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/depressScore/depressScore_pheno.txt", sep="\t", index=False, na_rep="NA")
-wellBeingSpectrum.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/wellBeingSpectrum/wellBeingSpectrum_pheno.txt", sep="\t", index=False, na_rep="NA")
-ageParents.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/ageParents90th/ageParents90th_pheno.txt", sep="\t", index=False, na_rep="NA")
-actModVig.to_csv("/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/actModVig/actModVig_pheno.txt", sep="\t", index=False, na_rep="NA")
+dpw.to_csv(os.path.join(construction_fp, "dpw/dpw_pheno.txt"), sep="\t", index=False, na_rep="NA")
+educ.to_csv(os.path.join(construction_fp, "educYears/educYears_pheno.txt"), sep="\t", index=False, na_rep="NA")
+householdIncome.to_csv(os.path.join(construction_fp, "householdIncome/householdIncome_pheno.txt"), sep="\t", index=False, na_rep="NA")
+health.to_csv(os.path.join(construction_fp, "healthRating/healthRating_pheno.txt"), sep="\t", index=False, na_rep="NA")
+maxcpd.to_csv(os.path.join(construction_fp, "maxcpd/maxcpd_pheno.txt"), sep="\t", index=False, na_rep="NA")
+ageFirstBirth.to_csv(os.path.join(construction_fp, "ageFirstBirth/ageFirstBirth_pheno.txt"), sep="\t", index=False, na_rep="NA")
+smokeInit.to_csv(os.path.join(construction_fp, "smokeInit/smokeInit_pheno.txt"), sep="\t", index=False, na_rep="NA")
+bmi.to_csv(os.path.join(construction_fp, "bmi/bmi_pheno.txt"), sep="\t", index=False, na_rep="NA")
+cesSmoke.to_csv(os.path.join(construction_fp, "cesSmoke/cesSmoke_pheno.txt"), sep="\t", index=False, na_rep="NA")
+t2d.to_csv(os.path.join(construction_fp, "t2d/t2d_pheno.txt"), sep="\t", index=False, na_rep="NA")
+t1d.to_csv(os.path.join(construction_fp, "t1d/t1d_pheno.txt"), sep="\t", index=False, na_rep="NA")
+memoryTest.to_csv(os.path.join(construction_fp, "memoryTest/memoryTest_pheno.txt"), sep="\t", index=False, na_rep="NA")
+highBloodPressure.to_csv(os.path.join(construction_fp, "highBloodPressure/highBloodPressure_pheno.txt"), sep="\t", index=False, na_rep="NA")
+medsTaken.to_csv(os.path.join(construction_fp, "medsTaken/medsTaken_pheno.txt"), sep="\t", index=False, na_rep="NA")
+loneliness.to_csv(os.path.join(construction_fp, "loneliness/loneliness_pheno.txt"), sep="\t", index=False, na_rep="NA")
+smokeInit.to_csv(os.path.join(construction_fp, "smokeInit/smokeInit_pheno.txt"), sep="\t", index=False, na_rep="NA")
+depress.to_csv(os.path.join(construction_fp, "depress/depress_pheno.txt"), sep="\t", index=False, na_rep="NA")
+insomniaFrequent.to_csv(os.path.join(construction_fp, "insomniaFrequent/insomniaFrequent_pheno.txt"), sep="\t", index=False, na_rep="NA")
+arthritis.to_csv(os.path.join(construction_fp, "arthritis/arthritis_pheno.txt"), sep="\t", index=False, na_rep="NA")
+nonCancerIllness.to_csv(os.path.join(construction_fp, "nonCancerIllness/nonCancerIllness_pheno.txt"), sep="\t", index=False, na_rep="NA")
+anxiety.to_csv(os.path.join(construction_fp, "anxiety/anxiety_pheno.txt"), sep="\t", index=False, na_rep="NA")
+height.to_csv(os.path.join(construction_fp, "height/height_pheno.txt"), sep="\t", index=False, na_rep="NA")
+asthma.to_csv(os.path.join(construction_fp, "asthma/asthma_pheno.txt"), sep="\t", index=False, na_rep="NA")
+neuroticismScore.to_csv(os.path.join(construction_fp, "neuroticismScore/neuroticismScore_pheno.txt"), sep="\t", index=False, na_rep="NA")
+worryFeeling.to_csv(os.path.join(construction_fp, "worryFeeling/worryFeeling_pheno.txt"), sep="\t", index=False, na_rep="NA")
+cancerBreast.to_csv(os.path.join(construction_fp, "cancerBreast/cancerBreast_pheno.txt"), sep="\t", index=False, na_rep="NA")
+totChol.to_csv(os.path.join(construction_fp, "totChol/totChol_pheno.txt"), sep="\t", index=False, na_rep="NA")
+stroke.to_csv(os.path.join(construction_fp, "stroke/stroke_pheno.txt"), sep="\t", index=False, na_rep="NA")
+childrenEverFathered.to_csv(os.path.join(construction_fp, "childrenEverFathered/childrenEverFathered_pheno.txt"), sep="\t", index=False, na_rep="NA")
+obesitySevere.to_csv(os.path.join(construction_fp, "obesitySevere/obesitySevere_pheno.txt"), sep="\t", index=False, na_rep="NA")
+cancer.to_csv(os.path.join(construction_fp, "cancer/cancer_pheno.txt"), sep="\t", index=False, na_rep="NA")
+risk.to_csv(os.path.join(construction_fp, "risk/risk_pheno.txt"), sep="\t", index=False, na_rep="NA")
+alzheimer.to_csv(os.path.join(construction_fp, "alzheimer/alzheimer_pheno.txt"), sep="\t", index=False, na_rep="NA")
+cataract.to_csv(os.path.join(construction_fp, "cataract/cataract_pheno.txt"), sep="\t", index=False, na_rep="NA")
+hearingDifficulty.to_csv(os.path.join(construction_fp, "hearingDifficulty/hearingDifficulty_pheno.txt"), sep="\t", index=False, na_rep="NA")
+childrenEverMothered.to_csv(os.path.join(construction_fp, "childrenEverMothered/childrenEverMothered_pheno.txt"), sep="\t", index=False, na_rep="NA")
+cancerProstate.to_csv(os.path.join(construction_fp, "cancerProstate/cancerProstate_pheno.txt"), sep="\t", index=False, na_rep="NA")
+cad.to_csv(os.path.join(construction_fp, "cad/cad_pheno.txt"), sep="\t", index=False, na_rep="NA")
+cogPerformance.to_csv(os.path.join(construction_fp, "cogPerformance/cogPerformance_pheno.txt"), sep="\t", index=False, na_rep="NA")
+positiveAffect.to_csv(os.path.join(construction_fp, "positiveAffect/positiveAffect_pheno.txt"), sep="\t", index=False, na_rep="NA")
+lifeSatisfaction.to_csv(os.path.join(construction_fp, "lifeSatisfaction/lifeSatisfaction_pheno.txt"), sep="\t", index=False, na_rep="NA")
+depressScore.to_csv(os.path.join(construction_fp, "depressScore/depressScore_pheno.txt"), sep="\t", index=False, na_rep="NA")
+wellBeingSpectrum.to_csv(os.path.join(construction_fp, "wellBeingSpectrum/wellBeingSpectrum_pheno.txt"), sep="\t", index=False, na_rep="NA")
+ageParents.to_csv(os.path.join(construction_fp, "ageParents90th/ageParents90th_pheno.txt"), sep="\t", index=False, na_rep="NA")
+actModVig.to_csv(os.path.join(construction_fp, "actModVig/actModVig_pheno.txt"), sep="\t", index=False, na_rep="NA")
