@@ -3,6 +3,11 @@ import numpy as np
 import re
 import os
 
+### DEFINE FILE PATHS
+construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction"
+ukb_fp = "/home/ubuntu/biroli/ukb/ukb23283.csv.gz"
+sibs_fp = "/home/ubuntu/biroli/ukb/family_siblings_UKB.csv"
+
 #### READ UKB DATA
 ukb_cols = ["31",		# Gender
 			"34", 		# Year of birth
@@ -61,10 +66,9 @@ ukb_cols = ["31",		# Gender
 			"20514", "20510", "20517" , "20519", "20511", "20507", "20508", "20518", "20513"      
 						# Depressive symptoms
 			]
-construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction"
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
-ukb_iterator = pd.read_csv("/home/ubuntu/biroli/ukb/ukb23283.csv.gz", engine="python", encoding = "ISO-8859-1",
+ukb_iterator = pd.read_csv(ukb_fp, engine="python", encoding = "ISO-8859-1",
 					# keep only columns that regex match with our variables of interest since this is a 15GB file
 					usecols=lambda col: re.search("eid|^" + "-|^".join(ukb_cols) + "-", col), chunksize=50000)
 chunk_list = []
@@ -76,7 +80,7 @@ ukb = pd.concat(chunk_list)
 # filter on genetically caucasian individuals and filter out heterozygosity, sex outliers
 ukb = ukb[(ukb["22006-0.0"] == 1) & (ukb["22027-0.0"] != 1) & (ukb["22019-0.0"] != 1)]
 # remove siblings so they can be used as validation
-sibs = pd.read_csv("/home/ubuntu/biroli/ukb/family_siblings_UKB.csv", usecols=["ID"])
+sibs = pd.read_csv(sibs_fp, usecols=["ID"])
 non_sibs = set(ukb.eid).difference(sibs.ID)
 ukb = ukb[ukb.eid.isin(non_sibs)]
 
@@ -85,7 +89,6 @@ ukb.insert(0, "IID", ukb.eid)
 ukb.insert(0, "FID", ukb.eid)
 # covariates are gender, year of birth, and first 20 principal components
 covar_cols = [col for col in ukb.columns if re.search("^(FID|IID|31-0\.0|34-0\.0|22009-0\.([1-9]$|1[0-9]|20))", col)]
-ukb[covar_cols].to_csv(os.path.join(construction_fp, "ukb_covars.txt") sep="\t", index=False, na_rep="NA")
 
 # set of columns to use for all self-reported diagnoses
 diagnosis_cols = [col for col in ukb.columns if re.search("^4120(2|4)-", col)]
@@ -533,6 +536,7 @@ actModVig = ukb.dropna(subset=["actModVig"])[["FID", "IID", "actModVig"]]
 del ukb_actModVig
 
 # write data
+ukb[covar_cols].to_csv(os.path.join(construction_fp, "ukb_covars.txt") sep="\t", index=False, na_rep="NA")
 dpw.to_csv(os.path.join(construction_fp, "dpw/dpw_pheno.txt"), sep="\t", index=False, na_rep="NA")
 educ.to_csv(os.path.join(construction_fp, "educYears/educYears_pheno.txt"), sep="\t", index=False, na_rep="NA")
 householdIncome.to_csv(os.path.join(construction_fp, "householdIncome/householdIncome_pheno.txt"), sep="\t", index=False, na_rep="NA")
