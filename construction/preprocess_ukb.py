@@ -33,6 +33,7 @@ ukb_cols = ["31",		# Gender
 						# Alzheimer's Disease
 			"20018",	# Prospective memory test 
 			"6150",		# High blood pressure
+						# Stroke
 			"137",		# Treatments / medications taken 
 			"2020",		# Loneliness 
 			"20116",	# Smoke Initiation
@@ -47,7 +48,6 @@ ukb_cols = ["31",		# Gender
 			"2000",		# Feeling Worry
 			"40006",	# Breast Cancer		
 			"30690",	# Cholesterol
-			"6150",		# Stroke
 			"2405", 	# Number of children fathered (male) 
 			"2453",		# Cancer
 			"2040",		# Risk taking behaviour
@@ -221,10 +221,11 @@ memoryTest = ukb.dropna(subset=["memoryTest"])[["FID", "IID", "memoryTest"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
 highBloodPressure_dict = {4: 1, -3: np.nan}
 highBloodPressure_cols = [col for col in ukb.columns if re.search("^6150-", col)]
-ukb[highBloodPressure_cols] = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x,0))
+ukb_highBloodPressure = ukb[highBloodPressure_cols].applymap(lambda x: highBloodPressure_dict.get(x,0))
 # use maximum to maintain consistency across individuals since it's binary
-ukb["highBloodPressure"] = ukb[highBloodPressure_cols].max(axis=1)
+ukb["highBloodPressure"] = ukb_highBloodPressure.max(axis=1)
 highBloodPressure = ukb.dropna(subset=["highBloodPressure"])[["FID", "IID", "highBloodPressure"]]
+del ukb_highBloodPressure
 
 # TREATMENTS / MADICATIONS TAKEN 
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=137
@@ -344,10 +345,11 @@ totChol = ukb.dropna(subset=["totChol"])[["FID", "IID", "totChol"]]
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
 stroke_dict = {-3: np.nan, 3: 1}
 stroke_cols = [col for col in ukb.columns if re.search("^6150-", col)]
-ukb[stroke_cols] = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, 0))
+ukb_stroke = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, 0))
 # use max observation
-ukb["stroke"] = ukb[stroke_cols].max(axis=1)
+ukb["stroke"] = ukb_stroke.max(axis=1)
 stroke = ukb.dropna(subset=["stroke"])[["FID", "IID", "stroke"]]
+del ukb_stroke
 
 # NUMBER OF CHILDREN FATHERED (MALE) 
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2405
@@ -536,7 +538,7 @@ actModVig = ukb.dropna(subset=["actModVig"])[["FID", "IID", "actModVig"]]
 del ukb_actModVig
 
 # write data
-ukb[covar_cols].to_csv(os.path.join(construction_fp, "ukb_covars.txt") sep="\t", index=False, na_rep="NA")
+ukb[covar_cols].to_csv(os.path.join(construction_fp, "ukb_covars.txt"), sep="\t", index=False, na_rep="NA")
 dpw.to_csv(os.path.join(construction_fp, "dpw/dpw_pheno.txt"), sep="\t", index=False, na_rep="NA")
 educ.to_csv(os.path.join(construction_fp, "educYears/educYears_pheno.txt"), sep="\t", index=False, na_rep="NA")
 householdIncome.to_csv(os.path.join(construction_fp, "householdIncome/householdIncome_pheno.txt"), sep="\t", index=False, na_rep="NA")
