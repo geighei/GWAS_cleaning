@@ -29,7 +29,7 @@ parser.add_argument("-n", "--n_folds", dest="n_folds", default=2,
                     help="number of times you want to split UKB for separate GWAS")
 parser.add_argument("-f", "--folder", dest="sub_folder", default="split_sample",
                     help="folder name for storing regenie output (goes in phenotype folder in construction)")
-args = parser.parse_args(raw_args)
+args = parser.parse_args()
 
 ### FILE PATHS --------------------------------- ###
 # constant file paths (note: add 'regenie' executable to your path so you don't need to point to it)
