@@ -25,7 +25,7 @@ seed(112794)
 parser = argparse.ArgumentParser(description='Process inputs.')
 parser.add_argument("-p", "--pheno", dest="pheno", required=True,
                     help="name of trait for which we are constructing GWAS")
-parser.add_argument("-n", "--n_folds", dest="n_folds", default=2,
+parser.add_argument("-n", "--n_folds", type=int, dest="n_folds", default=2,
                     help="number of times you want to split UKB for separate GWAS")
 parser.add_argument("-f", "--folder", dest="sub_folder", default="split_sample",
                     help="folder name for storing regenie output (goes in phenotype folder in construction)")
