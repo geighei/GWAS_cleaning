@@ -2,9 +2,11 @@ import pandas as pd
 import numpy as np
 import re
 import os
+import subprocess
 
 ### DEFINE FILE PATHS
 construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction"
+crosswalk_fp = os.path.join(construction_fp, "ukb_v3_newbasket.s487395.crosswalk")
 ukb_fp = "/home/ubuntu/biroli/ukb/ukb23283.csv.gz"
 sibs_fp = "/home/ubuntu/biroli/ukb/family_siblings_UKB.csv"
 
@@ -538,6 +540,15 @@ actModVig = ukb.dropna(subset=["actModVig"])[["FID", "IID", "actModVig"]]
 del ukb_actModVig
 
 # write data
+
+## write_pheno: Write phenotype file with option to pass through crosswalk 
+# 				to have 1-1 map with genotypic data (calling awk bash script)
+def write_pheno(df, fp, crosswalk=None):
+	df.to_csv(os.path.join(fp, ".txt"), sep="\t", index=False, na_rep="NA")
+	if crosswalk is None:
+		return
+	subprocess.run(["./crosswalk_map.sh","--fp",fp,"--cross",crosswalk])
+
 ukb[covar_cols].to_csv(os.path.join(construction_fp, "ukb_covars.txt"), sep="\t", index=False, na_rep="NA")
 dpw.to_csv(os.path.join(construction_fp, "dpw/dpw_pheno.txt"), sep="\t", index=False, na_rep="NA")
 educ.to_csv(os.path.join(construction_fp, "educYears/educYears_pheno.txt"), sep="\t", index=False, na_rep="NA")
