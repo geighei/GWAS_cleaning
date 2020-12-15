@@ -89,6 +89,10 @@ if "crosswalk_fp" in locals():
 
 
 #### CLEAN UKB DATA
+# remove leading "f." from column names if present
+ukb.rename(columns=lambda x: re.sub("^f\.", "", x), inplace=True)
+# format so first separator is "-" (e.g. 31-0.0)
+ukb.rename(columns=lambda x: re.sub(r"([0-9]+)\.([0-9]+)", r"\1-\2", x), inplace=True)
 # filter on genetically caucasian individuals and filter out heterozygosity, sex outliers
 ukb = ukb[(ukb["22006-0.0"] == 1) & (ukb["22027-0.0"] != 1) & (ukb["22019-0.0"] != 1)]
 # remove siblings so they can be used as validation
