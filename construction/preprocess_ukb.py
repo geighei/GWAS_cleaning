@@ -6,9 +6,10 @@ import subprocess
 
 ### DEFINE FILE PATHS
 construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction"
-crosswalk_fp = os.path.join(construction_fp, "ukb_v3_newbasket.s487395.crosswalk")
+#crosswalk_fp = os.path.join(construction_fp, "ukb_v3_newbasket.s487395.crosswalk")
 ukb_fp = "/home/ubuntu/biroli/ukb/ukb23283.csv.gz"
 sibs_fp = "/home/ubuntu/biroli/ukb/family_siblings_UKB.csv"
+
 
 #### READ DATA
 # Read UKB data
@@ -86,6 +87,7 @@ sibs = pd.read_csv(sibs_fp, usecols=["ID"])
 if "crosswalk_fp" in locals():
 	crosswalk = pd.read_csv(crosswalk_fp, delim_whitespace=True, names=["genetic_ID", "IID"], index_col="IID")
 
+
 #### CLEAN UKB DATA
 # filter on genetically caucasian individuals and filter out heterozygosity, sex outliers
 ukb = ukb[(ukb["22006-0.0"] == 1) & (ukb["22027-0.0"] != 1) & (ukb["22019-0.0"] != 1)]
@@ -102,6 +104,8 @@ covar_cols = [col for col in ukb.columns if re.search("^(FID|IID|31-0\.0|34-0\.0
 # set of columns to use for all self-reported diagnoses
 diagnosis_cols = [col for col in ukb.columns if re.search("^4120(2|4)-", col)]
 
+
+#### CONSTRUCT PHENOTYPES
 # DRINKS PER WEEK
 # construction taken from biroli/ukb/alcohol/alcohol_panel_construction/reshape_ukb.R
 dpw_dict = {-1: np.nan, -3: np.nan}
@@ -546,8 +550,8 @@ ukb["actModVig"] = 4*ukb_actModVig.new894 + 8*ukb_actModVig.new914
 actModVig = ukb.dropna(subset=["actModVig"])[["FID", "IID", "actModVig"]]
 del ukb_actModVig
 
-# write data
 
+#### WRITE DATA
 ## write_pheno: Write phenotype file with option to pass through crosswalk 
 # 				to have 1-1 map with genotypic data (calling awk bash script)
 def write_pheno(df, fp, crosswalk=None):
@@ -563,51 +567,51 @@ def write_pheno(df, fp, crosswalk=None):
 	joined.drop("genetic_ID", axis=1) \
 			.to_csv(fp+".PREPARED.txt", sep="\t", index=False, na_rep="NA")
 
+# write all data
 #crosswalk=None   # uncomment to ignore crosswalk functionality
 write_pheno(ukb[covar_cols], os.path.join(construction_fp, "ukb_covars_test"), crosswalk)
-ukb[covar_cols].to_csv(os.path.join(construction_fp, "ukb_covars.txt"), sep="\t", index=False, na_rep="NA")
-dpw.to_csv(os.path.join(construction_fp, "dpw/dpw_pheno.txt"), sep="\t", index=False, na_rep="NA")
-educ.to_csv(os.path.join(construction_fp, "educYears/educYears_pheno.txt"), sep="\t", index=False, na_rep="NA")
-householdIncome.to_csv(os.path.join(construction_fp, "householdIncome/householdIncome_pheno.txt"), sep="\t", index=False, na_rep="NA")
-health.to_csv(os.path.join(construction_fp, "healthRating/healthRating_pheno.txt"), sep="\t", index=False, na_rep="NA")
-maxcpd.to_csv(os.path.join(construction_fp, "maxcpd/maxcpd_pheno.txt"), sep="\t", index=False, na_rep="NA")
-ageFirstBirth.to_csv(os.path.join(construction_fp, "ageFirstBirth/ageFirstBirth_pheno.txt"), sep="\t", index=False, na_rep="NA")
-smokeInit.to_csv(os.path.join(construction_fp, "smokeInit/smokeInit_pheno.txt"), sep="\t", index=False, na_rep="NA")
-bmi.to_csv(os.path.join(construction_fp, "bmi/bmi_pheno.txt"), sep="\t", index=False, na_rep="NA")
-cesSmoke.to_csv(os.path.join(construction_fp, "cesSmoke/cesSmoke_pheno.txt"), sep="\t", index=False, na_rep="NA")
-t2d.to_csv(os.path.join(construction_fp, "t2d/t2d_pheno.txt"), sep="\t", index=False, na_rep="NA")
-t1d.to_csv(os.path.join(construction_fp, "t1d/t1d_pheno.txt"), sep="\t", index=False, na_rep="NA")
-memoryTest.to_csv(os.path.join(construction_fp, "memoryTest/memoryTest_pheno.txt"), sep="\t", index=False, na_rep="NA")
-highBloodPressure.to_csv(os.path.join(construction_fp, "highBloodPressure/highBloodPressure_pheno.txt"), sep="\t", index=False, na_rep="NA")
-medsTaken.to_csv(os.path.join(construction_fp, "medsTaken/medsTaken_pheno.txt"), sep="\t", index=False, na_rep="NA")
-loneliness.to_csv(os.path.join(construction_fp, "loneliness/loneliness_pheno.txt"), sep="\t", index=False, na_rep="NA")
-smokeInit.to_csv(os.path.join(construction_fp, "smokeInit/smokeInit_pheno.txt"), sep="\t", index=False, na_rep="NA")
-depress.to_csv(os.path.join(construction_fp, "depress/depress_pheno.txt"), sep="\t", index=False, na_rep="NA")
-insomniaFrequent.to_csv(os.path.join(construction_fp, "insomniaFrequent/insomniaFrequent_pheno.txt"), sep="\t", index=False, na_rep="NA")
-arthritis.to_csv(os.path.join(construction_fp, "arthritis/arthritis_pheno.txt"), sep="\t", index=False, na_rep="NA")
-nonCancerIllness.to_csv(os.path.join(construction_fp, "nonCancerIllness/nonCancerIllness_pheno.txt"), sep="\t", index=False, na_rep="NA")
-anxiety.to_csv(os.path.join(construction_fp, "anxiety/anxiety_pheno.txt"), sep="\t", index=False, na_rep="NA")
-height.to_csv(os.path.join(construction_fp, "height/height_pheno.txt"), sep="\t", index=False, na_rep="NA")
-asthma.to_csv(os.path.join(construction_fp, "asthma/asthma_pheno.txt"), sep="\t", index=False, na_rep="NA")
-neuroticismScore.to_csv(os.path.join(construction_fp, "neuroticismScore/neuroticismScore_pheno.txt"), sep="\t", index=False, na_rep="NA")
-worryFeeling.to_csv(os.path.join(construction_fp, "worryFeeling/worryFeeling_pheno.txt"), sep="\t", index=False, na_rep="NA")
-cancerBreast.to_csv(os.path.join(construction_fp, "cancerBreast/cancerBreast_pheno.txt"), sep="\t", index=False, na_rep="NA")
-totChol.to_csv(os.path.join(construction_fp, "totChol/totChol_pheno.txt"), sep="\t", index=False, na_rep="NA")
-stroke.to_csv(os.path.join(construction_fp, "stroke/stroke_pheno.txt"), sep="\t", index=False, na_rep="NA")
-childrenEverFathered.to_csv(os.path.join(construction_fp, "childrenEverFathered/childrenEverFathered_pheno.txt"), sep="\t", index=False, na_rep="NA")
-obesitySevere.to_csv(os.path.join(construction_fp, "obesitySevere/obesitySevere_pheno.txt"), sep="\t", index=False, na_rep="NA")
-cancer.to_csv(os.path.join(construction_fp, "cancer/cancer_pheno.txt"), sep="\t", index=False, na_rep="NA")
-risk.to_csv(os.path.join(construction_fp, "risk/risk_pheno.txt"), sep="\t", index=False, na_rep="NA")
-alzheimer.to_csv(os.path.join(construction_fp, "alzheimer/alzheimer_pheno.txt"), sep="\t", index=False, na_rep="NA")
-cataract.to_csv(os.path.join(construction_fp, "cataract/cataract_pheno.txt"), sep="\t", index=False, na_rep="NA")
-hearingDifficulty.to_csv(os.path.join(construction_fp, "hearingDifficulty/hearingDifficulty_pheno.txt"), sep="\t", index=False, na_rep="NA")
-childrenEverMothered.to_csv(os.path.join(construction_fp, "childrenEverMothered/childrenEverMothered_pheno.txt"), sep="\t", index=False, na_rep="NA")
-cancerProstate.to_csv(os.path.join(construction_fp, "cancerProstate/cancerProstate_pheno.txt"), sep="\t", index=False, na_rep="NA")
-cad.to_csv(os.path.join(construction_fp, "cad/cad_pheno.txt"), sep="\t", index=False, na_rep="NA")
-cogPerformance.to_csv(os.path.join(construction_fp, "cogPerformance/cogPerformance_pheno.txt"), sep="\t", index=False, na_rep="NA")
-positiveAffect.to_csv(os.path.join(construction_fp, "positiveAffect/positiveAffect_pheno.txt"), sep="\t", index=False, na_rep="NA")
-lifeSatisfaction.to_csv(os.path.join(construction_fp, "lifeSatisfaction/lifeSatisfaction_pheno.txt"), sep="\t", index=False, na_rep="NA")
-depressScore.to_csv(os.path.join(construction_fp, "depressScore/depressScore_pheno.txt"), sep="\t", index=False, na_rep="NA")
-wellBeingSpectrum.to_csv(os.path.join(construction_fp, "wellBeingSpectrum/wellBeingSpectrum_pheno.txt"), sep="\t", index=False, na_rep="NA")
-ageParents.to_csv(os.path.join(construction_fp, "ageParents90th/ageParents90th_pheno.txt"), sep="\t", index=False, na_rep="NA")
-actModVig.to_csv(os.path.join(construction_fp, "actModVig/actModVig_pheno.txt"), sep="\t", index=False, na_rep="NA")
+write_pheno(dpw, os.path.join(construction_fp, "dpw/dpw_pheno"), crosswalk)
+write_pheno(educ, os.path.join(construction_fp, "educYears/educYears_pheno"), crosswalk)
+write_pheno(householdIncome, os.path.join(construction_fp, "householdIncome/householdIncome_pheno"), crosswalk)
+write_pheno(health, os.path.join(construction_fp, "healthRating/healthRating_pheno"), crosswalk)
+write_pheno(maxcpd, os.path.join(construction_fp, "maxcpd/maxcpd_pheno"), crosswalk)
+write_pheno(ageFirstBirth, os.path.join(construction_fp, "ageFirstBirth/ageFirstBirth_pheno"), crosswalk)
+write_pheno(smokeInit, os.path.join(construction_fp, "smokeInit/smokeInit_pheno"), crosswalk)
+write_pheno(bmi, os.path.join(construction_fp, "bmi/bmi_pheno"), crosswalk)
+write_pheno(cesSmoke, os.path.join(construction_fp, "cesSmoke/cesSmoke_pheno"), crosswalk)
+write_pheno(t2d, os.path.join(construction_fp, "t2d/t2d_pheno"), crosswalk)
+write_pheno(t1d, os.path.join(construction_fp, "t1d/t1d_pheno"), crosswalk)
+write_pheno(memoryTest, os.path.join(construction_fp, "memoryTest/memoryTest_pheno"), crosswalk)
+write_pheno(highBloodPressure, os.path.join(construction_fp, "highBloodPressure/highBloodPressure_pheno"), crosswalk)
+write_pheno(medsTaken, os.path.join(construction_fp, "medsTaken/medsTaken_pheno"), crosswalk)
+write_pheno(loneliness, os.path.join(construction_fp, "loneliness/loneliness_pheno"), crosswalk)
+write_pheno(smokeInit, os.path.join(construction_fp, "smokeInit/smokeInit_pheno"), crosswalk)
+write_pheno(depress, os.path.join(construction_fp, "depress/depress_pheno"), crosswalk)
+write_pheno(insomniaFrequent, os.path.join(construction_fp, "insomniaFrequent/insomniaFrequent_pheno"), crosswalk)
+write_pheno(arthritis, os.path.join(construction_fp, "arthritis/arthritis_pheno"), crosswalk)
+write_pheno(nonCancerIllness, os.path.join(construction_fp, "nonCancerIllness/nonCancerIllness_pheno"), crosswalk)
+write_pheno(anxiety, os.path.join(construction_fp, "anxiety/anxiety_pheno"), crosswalk)
+write_pheno(height, os.path.join(construction_fp, "height/height_pheno"), crosswalk)
+write_pheno(asthma, os.path.join(construction_fp, "asthma/asthma_pheno"), crosswalk)
+write_pheno(neuroticismScore, os.path.join(construction_fp, "neuroticismScore/neuroticismScore_pheno"), crosswalk)
+write_pheno(worryFeeling, os.path.join(construction_fp, "worryFeeling/worryFeeling_pheno"), crosswalk)
+write_pheno(cancerBreast, os.path.join(construction_fp, "cancerBreast/cancerBreast_pheno"), crosswalk)
+write_pheno(totChol, os.path.join(construction_fp, "totChol/totChol_pheno"), crosswalk)
+write_pheno(stroke, os.path.join(construction_fp, "stroke/stroke_pheno"), crosswalk)
+write_pheno(childrenEverFathered, os.path.join(construction_fp, "childrenEverFathered/childrenEverFathered_pheno"), crosswalk)
+write_pheno(obesitySevere, os.path.join(construction_fp, "obesitySevere/obesitySevere_pheno"), crosswalk)
+write_pheno(cancer, os.path.join(construction_fp, "cancer/cancer_pheno"), crosswalk)
+write_pheno(risk, os.path.join(construction_fp, "risk/risk_pheno"), crosswalk)
+write_pheno(alzheimer, os.path.join(construction_fp, "alzheimer/alzheimer_pheno"), crosswalk)
+write_pheno(cataract, os.path.join(construction_fp, "cataract/cataract_pheno"), crosswalk)
+write_pheno(hearingDifficulty, os.path.join(construction_fp, "hearingDifficulty/hearingDifficulty_pheno"), crosswalk)
+write_pheno(childrenEverMothered, os.path.join(construction_fp, "childrenEverMothered/childrenEverMothered_pheno"), crosswalk)
+write_pheno(cancerProstate, os.path.join(construction_fp, "cancerProstate/cancerProstate_pheno"), crosswalk)
+write_pheno(cad, os.path.join(construction_fp, "cad/cad_pheno"), crosswalk)
+write_pheno(cogPerformance, os.path.join(construction_fp, "cogPerformance/cogPerformance_pheno"), crosswalk)
+write_pheno(positiveAffect, os.path.join(construction_fp, "positiveAffect/positiveAffect_pheno"), crosswalk)
+write_pheno(lifeSatisfaction, os.path.join(construction_fp, "lifeSatisfaction/lifeSatisfaction_pheno"), crosswalk)
+write_pheno(depressScore, os.path.join(construction_fp, "depressScore/depressScore_pheno"), crosswalk)
+write_pheno(wellBeingSpectrum, os.path.join(construction_fp, "wellBeingSpectrum/wellBeingSpectrum_pheno"), crosswalk)
+write_pheno(ageParents, os.path.join(construction_fp, "ageParents90th/ageParents90th_pheno"), crosswalk)
+write_pheno(actModVig, os.path.join(construction_fp, "actModVig/actModVig_pheno"), crosswalk)
