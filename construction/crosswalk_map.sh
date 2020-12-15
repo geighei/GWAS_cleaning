@@ -15,8 +15,8 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-awk 'BEGIN {print "FID", "IID", "resid"}
-NR==FNR {if($2 != "NA") {a[$1] = $2 + 1; next}}
+awk 'BEGIN {print "FID", "IID", "pheno"}
+NR==FNR {if($3 != "NA") {a[$1] = $3 + 1; next}}
 NR!=FNR {if(a[$2] != 0) {print $1, $1, a[$2] - 1}
 else if(a[$2] == 0) {print $1, $1, "NA"}}' \
 	${fp}.txt ${crosswalk} > ${fp}.PREPARED.pheno

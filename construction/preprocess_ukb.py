@@ -10,7 +10,8 @@ crosswalk_fp = os.path.join(construction_fp, "ukb_v3_newbasket.s487395.crosswalk
 ukb_fp = "/home/ubuntu/biroli/ukb/ukb23283.csv.gz"
 sibs_fp = "/home/ubuntu/biroli/ukb/family_siblings_UKB.csv"
 
-#### READ UKB DATA
+#### READ DATA
+# Read UKB data
 ukb_cols = ["31",		# Gender
 			"34", 		# Year of birth
 			"22006",	# Genetic ethnic grouping
@@ -78,11 +79,17 @@ for chunk in ukb_iterator:
 	chunk_list.append(chunk)
 ukb = pd.concat(chunk_list)
 
+# Read siblings data
+sibs = pd.read_csv(sibs_fp, usecols=["ID"])
+
+# Read crosswalk file if present
+if "crosswalk_fp" in locals():
+	crosswalk = pd.read_csv(crosswalk_fp, delim_whitespace=True, names=["genetic_ID", "IID"], index_col="IID")
+
 #### CLEAN UKB DATA
 # filter on genetically caucasian individuals and filter out heterozygosity, sex outliers
 ukb = ukb[(ukb["22006-0.0"] == 1) & (ukb["22027-0.0"] != 1) & (ukb["22019-0.0"] != 1)]
 # remove siblings so they can be used as validation
-sibs = pd.read_csv(sibs_fp, usecols=["ID"])
 non_sibs = set(ukb.eid).difference(sibs.ID)
 ukb = ukb[ukb.eid.isin(non_sibs)]
 
@@ -544,11 +551,20 @@ del ukb_actModVig
 ## write_pheno: Write phenotype file with option to pass through crosswalk 
 # 				to have 1-1 map with genotypic data (calling awk bash script)
 def write_pheno(df, fp, crosswalk=None):
-	df.to_csv(os.path.join(fp, ".txt"), sep="\t", index=False, na_rep="NA")
+	# write data frame as is
+	df.to_csv(fp+".txt", sep="\t", index=False, na_rep="NA")
+	# if crosswalk is provided, we join with it to transform IDs
 	if crosswalk is None:
 		return
-	subprocess.run(["./crosswalk_map.sh","--fp",fp,"--cross",crosswalk])
+	joined = df.join(crosswalk, how="inner", on="IID").drop(["FID", "IID"], axis=1)
+	joined.insert(0, "IID", joined.genetic_ID)
+	joined.insert(0, "FID", joined.genetic_ID)
+	# write "crosswalked" version in same place but with prefix
+	joined.drop("genetic_ID", axis=1) \
+			.to_csv(fp+".PREPARED.txt", sep="\t", index=False, na_rep="NA")
 
+#crosswalk=None   # uncomment to ignore crosswalk functionality
+write_pheno(ukb[covar_cols], os.path.join(construction_fp, "ukb_covars_test"), crosswalk)
 ukb[covar_cols].to_csv(os.path.join(construction_fp, "ukb_covars.txt"), sep="\t", index=False, na_rep="NA")
 dpw.to_csv(os.path.join(construction_fp, "dpw/dpw_pheno.txt"), sep="\t", index=False, na_rep="NA")
 educ.to_csv(os.path.join(construction_fp, "educYears/educYears_pheno.txt"), sep="\t", index=False, na_rep="NA")
