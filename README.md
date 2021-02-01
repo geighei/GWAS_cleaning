@@ -15,6 +15,7 @@ All code involving the construction, cleaning, processing, standardizing, "mungi
 
   ## RS_mapping
   - Purpose: codes to help mapping RS numbers into summary statistics that don't already have them (e.g. only have CHR-POS coordinates)
+  - compile_rsid_map.py is a compiles all RSIDs (unique SNP identifiers) from the HRC and 1000 genomes panels and combines into a minimal text file for use mapping from CHR:POS coordinates to SNP
   - RS_Merge_Diagnostics.R is a script which provides information about the percentage of SNPs in a sumstat that have RS numbers, by p-value level
   - mergeToRS.py is a program with command-line options which maps RSIDs given coordinates of structure CHR:POS by merging with a combined legend file from the 1000 Genomes project
   - batch_23andMe.sh is a script that calls mergeToRS.py for all 23&me sumstats
