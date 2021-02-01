@@ -7,8 +7,12 @@ import subprocess
 ### DEFINE FILE PATHS
 construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction"
 #crosswalk_fp = os.path.join(construction_fp, "ukb_v3_newbasket.s487395.crosswalk")
-ukb_fp = "/home/ubuntu/biroli/ukb/ukb23283.csv.gz"
-sibs_fp = "/home/ubuntu/biroli/ukb/family_siblings_UKB.csv"
+ukb_fp = "/home/ubuntu/biroli/ukb/ukb_updates/clean/master_ukb.csv.gz"
+sibs_fp = "/home/ubuntu/biroli/ukb/Siblings/output/UKB2_FS_withfam.txt"
+individual=False
+combine=True
+combine_fp = "/home/ubuntu/biroli/ukb/ukb_phenotypes.csv"
+filtered=False
 
 
 #### READ DATA
@@ -78,10 +82,11 @@ ukb_iterator = pd.read_csv(ukb_fp, engine="python", encoding = "ISO-8859-1",
 chunk_list = []
 for chunk in ukb_iterator:
 	chunk_list.append(chunk)
+
 ukb = pd.concat(chunk_list)
 
 # Read siblings data
-sibs = pd.read_csv(sibs_fp, usecols=["ID"])
+sibs = pd.read_csv(sibs_fp, usecols=["ID"], delim_whitespace=True)
 
 # Read crosswalk file if present
 if "crosswalk_fp" in locals():
@@ -93,11 +98,14 @@ if "crosswalk_fp" in locals():
 ukb.rename(columns=lambda x: re.sub("^f\.", "", x), inplace=True)
 # format so first separator is "-" (e.g. 31-0.0)
 ukb.rename(columns=lambda x: re.sub(r"([0-9]+)\.([0-9]+)", r"\1-\2", x), inplace=True)
-# filter on genetically caucasian individuals and filter out heterozygosity, sex outliers
-ukb = ukb[(ukb["22006-0.0"] == 1) & (ukb["22027-0.0"] != 1) & (ukb["22019-0.0"] != 1)]
-# remove siblings so they can be used as validation
-non_sibs = set(ukb.eid).difference(sibs.ID)
-ukb = ukb[ukb.eid.isin(non_sibs)]
+
+# can turn this off to get largest possible list of individuals if desired
+if filtered:
+	# filter on genetically caucasian individuals and filter out heterozygosity, sex outliers
+	ukb = ukb[(ukb["22006-0.0"] == 1) & (ukb["22027-0.0"] != 1) & (ukb["22019-0.0"] != 1)]
+	# remove siblings so they can be used as validation
+	non_sibs = set(ukb.eid).difference(sibs.ID)
+	ukb = ukb[ukb.eid.isin(non_sibs)]
 
 # relabel individual columns
 ukb.insert(0, "IID", ukb.eid)
@@ -108,6 +116,8 @@ covar_cols = [col for col in ukb.columns if re.search("^(FID|IID|31-0\.0|34-0\.0
 # set of columns to use for all self-reported diagnoses
 diagnosis_cols = [col for col in ukb.columns if re.search("^4120(2|4)-", col)]
 
+# create a data frame for the pertinent and cleaned columns to write out in combined form for future computation
+combined = ukb.loc[:, ["eid"]]
 
 #### CONSTRUCT PHENOTYPES
 # DRINKS PER WEEK
@@ -125,9 +135,11 @@ for i in range(0,3):
 	i = str(i)
 	tmp = ukb_dpw.filter(regex="-"+i)
 	ukb_dpw["dpw"+i] = tmp.sum(axis=1, skipna=False)
+
 # keep first non-missing wave and put back in ukb dataframe
 ukb["dpw"] = ukb_dpw.filter(regex="dpw").bfill(axis=1).iloc[:,0]
 dpw = ukb.dropna(subset=["dpw"])[["FID", "IID", "dpw"]]
+combined = pd.concat([combined, ukb_dpw], axis=1)
 del ukb_dpw
 
 # EDUCATIONAL ATTAINMENT
@@ -142,6 +154,7 @@ ukb[educ_cols] = ukb[educ_cols].applymap(lambda x: educ_dict.get(x,0))
 ukb["educYears"] = ukb[educ_cols].max(axis=1)
 # filter columns to only keep fid, iid, and education and rows to remove missing education
 educ = ukb.dropna(subset=["educYears"])[["FID", "IID", "educYears"]]
+combined = pd.concat([combined, ukb[educ_cols]], axis=1)
 
 # HOUSEHOLD INCOME
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100294
@@ -151,6 +164,7 @@ ukb[householdIncome_cols] = ukb[householdIncome_cols].applymap(lambda x: househo
 # went with maximum since an average might be skewed by retirement, lay-offs, etc
 ukb["householdIncome"] = ukb[householdIncome_cols].max(axis=1)
 householdIncome = ukb.dropna(subset=["householdIncome"])[["FID", "IID", "householdIncome"]]
+combined = pd.concat([combined, ukb[householdIncome_cols]], axis=1)
 
 # HEALTH RATING
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100508
@@ -160,6 +174,7 @@ ukb[health_cols] = ukb[health_cols].applymap(lambda x: health_dict.get(x,0))
 # average health
 ukb["healthRating"] = ukb[health_cols].mean(axis=1)
 health = ukb.dropna(subset=["healthRating"])[["FID", "IID", "healthRating"]]
+combined = pd.concat([combined, ukb[health_cols]], axis=1)
 
 # CIGARETTES PER DAY
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=2887
@@ -170,6 +185,7 @@ ukb[maxcpd_cols] = ukb[maxcpd_cols].applymap(lambda x: maxcpd_dict.get(x, x))
 # we want to measure propensity to addiction so maximum is more appropriate
 ukb["maxcpd"] = ukb[maxcpd_cols].max(axis=1)
 maxcpd = ukb.dropna(subset=["maxcpd"])[["FID", "IID", "maxcpd"]]
+combined = pd.concat([combined, ukb[maxcpd_cols]], axis=1)
 
 # AGE FIRST BIRTH (female)
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=2754
@@ -180,6 +196,7 @@ ukb[ageFirstBirth_cols] = ukb[ageFirstBirth_cols].applymap(lambda x: ageFirstBir
 # use first available observation as there shouldn't be inconsistencies
 ukb["ageFirstBirth"] = ukb[ageFirstBirth_cols].bfill(axis=1).iloc[:,0]
 ageFirstBirth = ukb.dropna(subset=["ageFirstBirth"])[["FID", "IID", "ageFirstBirth"]]
+combined = pd.concat([combined, ukb[ageFirstBirth_cols]], axis=1)
 
 # AGE STARTED SMOKING
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=2867
@@ -190,6 +207,7 @@ ukb[smokeInit_cols] = ukb[smokeInit_cols].applymap(lambda x: smokeInit_dict.get(
 # use first available observation as there shouldn't be inconsistencies
 ukb["smokeInit"] = ukb[smokeInit_cols].bfill(axis=1).iloc[:,0]
 smokeInit = ukb.dropna(subset=["smokeInit"])[["FID", "IID", "smokeInit"]]
+combined = pd.concat([combined, ukb[smokeInit_cols]], axis=1)
 
 # BODY MASS INDEX
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=21001
@@ -197,6 +215,7 @@ bmi_cols = [col for col in ukb.columns if re.search("^21001-", col)]
 # use first available observation, for vast majority this is initial assessment
 ukb["bmi"] = ukb[bmi_cols].mean(axis=1)
 bmi = ukb.dropna(subset=["bmi"])[["FID", "IID", "bmi"]]
+combined = pd.concat([combined, ukb[bmi_cols]], axis=1)
 
 # SMOKING CESSATION
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=90
@@ -206,6 +225,7 @@ ukb[cesSmoke_cols] = ukb[cesSmoke_cols].applymap(lambda x: cesSmoke_dict.get(x,0
 # use first available observation to maintain consistency across individuals since it's binary
 ukb["cesSmoke"] = ukb[cesSmoke_cols].bfill(axis=1).iloc[:,0]
 cesSmoke = ukb.dropna(subset=["cesSmoke"])[["FID", "IID", "cesSmoke"]]
+combined = pd.concat([combined, ukb[cesSmoke_cols]], axis=1)
 
 # TYPE II DIABETES
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=41204
@@ -214,6 +234,7 @@ ukb_t2d = ukb[diagnosis_cols].applymap(lambda x: t2d_dict.get(x, 0))
 # select any observation equal to 1
 ukb["t2d"] = ukb_t2d.max(axis=1)
 t2d = ukb.dropna(subset=["t2d"])[["FID", "IID", "t2d"]]
+combined = pd.concat([combined, ukb.loc[:, "t2d"]], axis=1)
 del ukb_t2d
 
 # TYPE I DIABETES
@@ -223,6 +244,7 @@ ukb_t1d = ukb[diagnosis_cols].applymap(lambda x: t1d_dict.get(x, 0))
 # use first available observation to maintain consistency across individuals since it's binary
 ukb["t1d"] = ukb_t1d.max(axis=1)
 t1d = ukb.dropna(subset=["t1d"])[["FID", "IID", "t1d"]]
+combined = pd.concat([combined, ukb.loc[:, "t1d"]], axis=1)
 del ukb_t1d
 
 # PROSPECTIVE MEMORY TEST
@@ -233,6 +255,7 @@ ukb[memoryTest_cols] = ukb[memoryTest_cols].applymap(lambda x: memoryTest_dict.g
 # use average value across individuals 
 ukb["memoryTest"] = ukb[memoryTest_cols].mean(axis=1)
 memoryTest = ukb.dropna(subset=["memoryTest"])[["FID", "IID", "memoryTest"]]
+combined = pd.concat([combined, ukb[memoryTest_cols]], axis=1)
 
 # HIGH BLOOD PRESSURE
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
@@ -242,6 +265,7 @@ ukb_highBloodPressure = ukb[highBloodPressure_cols].applymap(lambda x: highBlood
 # use maximum to maintain consistency across individuals since it's binary
 ukb["highBloodPressure"] = ukb_highBloodPressure.max(axis=1)
 highBloodPressure = ukb.dropna(subset=["highBloodPressure"])[["FID", "IID", "highBloodPressure"]]
+combined = pd.concat([combined, ukb_highBloodPressure], axis=1)
 del ukb_highBloodPressure
 
 # TREATMENTS / MADICATIONS TAKEN 
@@ -250,6 +274,7 @@ medsTaken_cols = [col for col in ukb.columns if re.search("^137-", col)]
 # use average value across individuals 
 ukb["medsTaken"] = ukb[medsTaken_cols].mean(axis=1)
 medsTaken = ukb.dropna(subset=["medsTaken"])[["FID", "IID", "medsTaken"]]
+combined = pd.concat([combined, ukb[medsTaken_cols]], axis=1)
 
 # LONELINESS
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2020 
@@ -259,6 +284,7 @@ ukb[loneliness_cols] = ukb[loneliness_cols].applymap(lambda x: loneliness_dict.g
 # use first available observation as there shouldn't be inconsistencies
 ukb["loneliness"] = ukb[loneliness_cols].max(axis=1)
 loneliness = ukb.dropna(subset=["loneliness"])[["FID", "IID", "loneliness"]]
+combined = pd.concat([combined, ukb[loneliness_cols]], axis=1)
 
 # SMOKE INITIATION
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20116
@@ -268,6 +294,7 @@ ukb[smokeInit_cols] = ukb[smokeInit_cols].applymap(lambda x: smokeInit_dict.get(
 # use last available observation as there shouldn't be inconsistencies
 ukb["smokeInit"] = ukb[smokeInit_cols].ffill(axis=1).iloc[:,0]
 smokeInit = ukb.dropna(subset=["smokeInit"])[["FID", "IID", "smokeInit"]]
+combined = pd.concat([combined, ukb[smokeInit_cols]], axis=1)
 
 # UNIPOLAR DEPRESSION
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20126
@@ -277,6 +304,7 @@ ukb[depress_cols] = ukb[depress_cols].applymap(lambda x: depress_dict.get(x,0))
 # use max observation as there shouldn't be inconsistencies
 ukb["depress"] = ukb[depress_cols].max(axis=1)
 depress = ukb.dropna(subset=["depress"])[["FID", "IID", "depress"]]
+combined = pd.concat([combined, ukb[depress_cols]], axis=1)
 
 # INSOMNIA SYMPTOMS
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=1200
@@ -286,6 +314,7 @@ ukb[insomniaFrequent_cols] = ukb[insomniaFrequent_cols].applymap(lambda x: insom
 # use max observation as there shouldn't be inconsistencies
 ukb["insomniaFrequent"] = ukb[insomniaFrequent_cols].max(axis=1)
 insomniaFrequent = ukb.dropna(subset=["insomniaFrequent"])[["FID", "IID", "insomniaFrequent"]]
+combined = pd.concat([combined, ukb[insomniaFrequent_cols]], axis=1)
 
 # ARTHRITIS 
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20002
@@ -295,6 +324,7 @@ ukb[arthritis_cols] = ukb[arthritis_cols].applymap(lambda x: arthritis_dict.get(
 # use fist available observation as there shouldn't be inconsistencies
 ukb["arthritis"] = ukb[arthritis_cols].max(axis=1)
 arthritis = ukb.dropna(subset=["arthritis"])[["FID", "IID", "arthritis"]]
+combined = pd.concat([combined, ukb[arthritis_cols]], axis=1)
 
 # NON-CANCER ILNESSES
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=135
@@ -302,6 +332,7 @@ nonCancerIllness_cols = [col for col in ukb.columns if re.search("^135-", col)]
 # use max observation as there shouldn't be inconsistencies
 ukb["nonCancerIllness"] = ukb[nonCancerIllness_cols].max(axis=1)
 nonCancerIllness = ukb.dropna(subset=["nonCancerIllness"])[["FID", "IID", "nonCancerIllness"]]
+combined = pd.concat([combined, ukb[nonCancerIllness_cols]], axis=1)
 
 # ANXIETY
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20421
@@ -311,6 +342,7 @@ ukb[anxiety_cols] = ukb[anxiety_cols].applymap(lambda x: anxiety_dict.get(x,x))
 # use fist available observation as there shouldn't be inconsistencies
 ukb["anxiety"] = ukb[anxiety_cols].max(axis=1)
 anxiety = ukb.dropna(subset=["anxiety"])[["FID", "IID", "anxiety"]]
+combined = pd.concat([combined, ukb[anxiety_cols]], axis=1)
 
 # HEIGHT
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=50
@@ -318,6 +350,7 @@ height_cols = [col for col in ukb.columns if re.search("^50-", col)]
 # use max observation as there shouldn't be inconsistencies
 ukb["height"] = ukb[height_cols].max(axis=1)
 height = ukb.dropna(subset=["height"])[["FID", "IID", "height"]]
+combined = pd.concat([combined, ukb[height_cols]], axis=1)
 
 # ASTHMA
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=22127
@@ -325,6 +358,7 @@ asthma_cols = [col for col in ukb.columns if re.search("^22127-", col)]
 # use max observation as there shouldn't be inconsistencies
 ukb["asthma"] = ukb[asthma_cols].max(axis=1)
 asthma = ukb.dropna(subset=["asthma"])[["FID", "IID", "asthma"]]
+combined = pd.concat([combined, ukb[asthma_cols]], axis=1)
 
 # NEUROTICISM SCORE
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20127
@@ -332,6 +366,7 @@ neuroticismScore_cols = [col for col in ukb.columns if re.search("^20127-", col)
 # use max observation as there shouldn't be inconsistencies
 ukb["neuroticismScore"] = ukb[neuroticismScore_cols].max(axis=1)
 neuroticismScore = ukb.dropna(subset=["neuroticismScore"])[["FID", "IID", "neuroticismScore"]]
+combined = pd.concat([combined, ukb[neuroticismScore_cols]], axis=1)
 
 # FEELING WORRY
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2000
@@ -341,6 +376,7 @@ ukb[worryFeeling_cols] = ukb[worryFeeling_cols].applymap(lambda x: worryFeeling_
 # use fist available observation as there shouldn't be inconsistencies
 ukb["worryFeeling"] = ukb[worryFeeling_cols].max(axis=1)
 worryFeeling = ukb.dropna(subset=["worryFeeling"])[["FID", "IID", "worryFeeling"]]
+combined = pd.concat([combined, ukb[worryFeeling_cols]], axis=1)
 
 # BREAST CANCER
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=40006
@@ -350,6 +386,7 @@ ukb[cancerBreast_cols] = ukb[cancerBreast_cols].applymap(lambda x: cancerBreast_
 # First available observation
 ukb["cancerBreast"] = ukb[cancerBreast_cols].max(axis=1)
 cancerBreast = ukb.dropna(subset=["cancerBreast"])[["FID", "IID", "cancerBreast"]]
+combined = pd.concat([combined, ukb[cancerBreast_cols]], axis=1)
 
 # CHOLESTEROL
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=30690
@@ -357,6 +394,7 @@ totChol_cols = [col for col in ukb.columns if re.search("^30690-", col)]
 # use mean observation as there shouldn't be inconsistencies
 ukb["totChol"] = ukb[totChol_cols].mean(axis=1)
 totChol = ukb.dropna(subset=["totChol"])[["FID", "IID", "totChol"]]
+combined = pd.concat([combined, ukb[totChol_cols]], axis=1)
 
 # STROKE
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150
@@ -366,6 +404,7 @@ ukb_stroke = ukb[stroke_cols].applymap(lambda x: stroke_dict.get(x, 0))
 # use max observation
 ukb["stroke"] = ukb_stroke.max(axis=1)
 stroke = ukb.dropna(subset=["stroke"])[["FID", "IID", "stroke"]]
+combined = pd.concat([combined, ukb_stroke], axis=1)
 del ukb_stroke
 
 # NUMBER OF CHILDREN FATHERED (MALE) 
@@ -376,6 +415,7 @@ ukb[childrenEverFathered_cols] = ukb[childrenEverFathered_cols].applymap(lambda 
 # use max observation as there shouldn't be inconsistencies
 ukb["childrenEverFathered"] = ukb[childrenEverFathered_cols].max(axis=1)
 childrenEverFathered = ukb.dropna(subset=["childrenEverFathered"])[["FID", "IID", "childrenEverFathered"]]
+combined = pd.concat([combined, ukb[childrenEverFathered_cols]], axis=1)
 
 # SEVERE OBESITY
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
@@ -384,6 +424,7 @@ ukb_obesitySevere = ukb[diagnosis_cols].applymap(lambda x: obesitySevere_dict.ge
 # max available observation
 ukb["obesitySevere"] = ukb_obesitySevere.max(axis=1)
 obesitySevere = ukb.dropna(subset=["obesitySevere"])[["FID", "IID", "obesitySevere"]]
+combined = pd.concat([combined, ukb.loc[:, "obesitySevere"]], axis=1)
 del ukb_obesitySevere
 
 # CANCER
@@ -394,6 +435,7 @@ ukb[cancer_cols] = ukb[cancer_cols].applymap(lambda x: cancer_dict.get(x, x))
 # use max observation as there shouldn't be inconsistencies
 ukb["cancer"] = ukb[cancer_cols].max(axis=1)
 cancer = ukb.dropna(subset=["cancer"])[["FID", "IID", "cancer"]]
+combined = pd.concat([combined, ukb[cancer_cols]], axis=1)
 
 # RISK TAKING BEHAVIOUR
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2040
@@ -403,6 +445,7 @@ ukb[risk_cols] = ukb[risk_cols].applymap(lambda x: risk_dict.get(x, x))
 # use max observation as there shouldn't be inconsistencies
 ukb["risk"] = ukb[risk_cols].max(axis=1)
 risk = ukb.dropna(subset=["risk"])[["FID", "IID", "risk"]]
+combined = pd.concat([combined, ukb[risk_cols]], axis=1)
 
 # ALZHEIMER'S
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41270
@@ -411,6 +454,7 @@ ukb_alzheimer = ukb[diagnosis_cols].applymap(lambda x: alzheimer_dict.get(x, 0))
 # max available observation
 ukb["alzheimer"] = ukb_alzheimer.max(axis=1)
 alzheimer = ukb.dropna(subset=["alzheimer"])[["FID", "IID", "alzheimer"]]
+combined = pd.concat([combined, ukb.loc[:, "alzheimer"]], axis=1)
 del ukb_alzheimer
 
 # CATARACT
@@ -422,6 +466,7 @@ ukb[cataract_cols] = ukb[cataract_cols].applymap(lambda x: cataract_dict.get(x, 
 # use max observation as there shouldn't be inconsistencies
 ukb["cataract"] = ukb[cataract_cols].max(axis=1)
 cataract = ukb.dropna(subset=["cataract"])[["FID", "IID", "cataract"]]
+combined = pd.concat([combined, ukb[cataract_cols]], axis=1)
 
 # HEARING DIFFICULTY
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2247
@@ -431,6 +476,7 @@ ukb[hearingDifficulty_cols] = ukb[hearingDifficulty_cols].applymap(lambda x: hea
 # use max observation as there shouldn't be inconsistencies
 ukb["hearingDifficulty"] = ukb[hearingDifficulty_cols].max(axis=1)
 hearingDifficulty = ukb.dropna(subset=["hearingDifficulty"])[["FID", "IID", "hearingDifficulty"]]
+combined = pd.concat([combined, ukb[hearingDifficulty_cols]], axis=1)
 
 # NUMBER OF LIVE BIRTH (FEMALE) 
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=2734
@@ -440,6 +486,7 @@ ukb[childrenEverMothered_cols] = ukb[childrenEverMothered_cols].applymap(lambda 
 # use max observation as there shouldn't be inconsistencies
 ukb["childrenEverMothered"] = ukb[childrenEverMothered_cols].max(axis=1)
 childrenEverMothered = ukb.dropna(subset=["childrenEverMothered"])[["FID", "IID", "childrenEverMothered"]]
+combined = pd.concat([combined, ukb[childrenEverMothered_cols]], axis=1)
 
 # PROSTATE CANCER
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20001
@@ -449,6 +496,7 @@ ukb[cancerProstate_cols] = ukb[cancerProstate_cols].applymap(lambda x: cancerPro
 # use max observation as there shouldn't be inconsistencies
 ukb["cancerProstate"] = ukb[cancerProstate_cols].max(axis=1)
 cancerProstate = ukb.dropna(subset=["cancerProstate"])[["FID", "IID", "cancerProstate"]]
+combined = pd.concat([combined, ukb[cancerProstate_cols]], axis=1)
 
 # CORONARY HEART DISEASE
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
@@ -457,6 +505,7 @@ ukb_cad = ukb[diagnosis_cols].applymap(lambda x: cad_dict.get(x, 0))
 # max available observation
 ukb["cad"] = ukb_cad.max(axis=1)
 cad = ukb.dropna(subset=["cad"])[["FID", "IID", "cad"]]
+combined = pd.concat([combined, ukb.loc[:, "cad"]], axis=1)
 del ukb_cad
 
 # COGNITIVE PERFORMANCE (ALSO DONE BY ANDRIES)
@@ -465,6 +514,7 @@ cogPerformance_cols = [col for col in ukb.columns if re.search("^20016-", col)]
 # use mean cognitive performance as measure 
 ukb["cogPerformance"] = ukb[cogPerformance_cols].mean(axis=1)
 cogPerformance = ukb.dropna(subset=["cogPerformance"])[["FID", "IID", "cogPerformance"]]
+combined = pd.concat([combined, ukb[cogPerformance_cols]], axis=1)
 
 # POSITIVE AFFECT
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20458
@@ -474,6 +524,7 @@ ukb[positiveAffect_cols] = ukb[positiveAffect_cols].applymap(lambda x: positiveA
 # use mean to avoid over-weighting time of particular observation
 ukb["positiveAffect"] = ukb[positiveAffect_cols].mean(axis=1)
 positiveAffect = ukb.dropna(subset=["positiveAffect"])[["FID", "IID", "positiveAffect"]]
+combined = pd.concat([combined, ukb[positiveAffect_cols]], axis=1)
 
 # LIFE SATISFACION
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20460
@@ -483,6 +534,7 @@ ukb[lifeSatisfaction_cols] = ukb[lifeSatisfaction_cols].applymap(lambda x: lifeS
 # use mean to avoid over-weighting time of particular observation
 ukb["lifeSatisfaction"] = ukb[lifeSatisfaction_cols].mean(axis=1)
 lifeSatisfaction = ukb.dropna(subset=["lifeSatisfaction"])[["FID", "IID", "lifeSatisfaction"]]
+combined = pd.concat([combined, ukb[lifeSatisfaction_cols]], axis=1)
 
 # DEPRESSIVE SYMPTOMS 
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20447
@@ -495,10 +547,12 @@ ukb_depressScore = ukb_depressScore.applymap(lambda x: depressScore_dict.get(x))
 # Sum all scores 
 ukb["depressScore"] = ukb_depressScore.sum(axis=1)
 depressScore = ukb.dropna(subset=["depressScore"])[["FID", "IID", "depressScore"]]
+combined = pd.concat([combined, ukb_depressScore], axis=1)
 del ukb_depressScore
 
 # WELL-BEING SPECTRUM
 ukb_wbSpectrum = ukb[["lifeSatisfaction","positiveAffect","neuroticismScore","depressScore"]]
+ukb_wbSpectrum = ukb_wbSpectrum.apply(pd.to_numeric, errors="coerce")
 ukb_wbSpectrum_sd = ukb_wbSpectrum.apply(lambda x: (x-x.mean())/x.std())
 # would like to use this approach but pandas has an eggregious bug that ignores axis argument
 #ukb_wbSpectrum_sd.fillna(value=0, axis=1, limit=1, inplace=True)
@@ -534,6 +588,7 @@ ukb["ageParents90th"] = \
 		(ukb_ageParents.fatherDeath.isnull() | ukb_ageParents.motherDeath.isnull()), 
 		np.nan, ukb_ageParents.ageParents90th)
 ageParents = ukb.dropna(subset=["ageParents90th"])[["FID", "IID", "ageParents90th"]]
+combined = pd.concat([combined, ukb_ageParents.loc[:, "ageParents90th"]], axis=1)
 del ukb_ageParents
 
 # MODERATE TO VIGOROUS PHYSICAL ACTIVITY
@@ -549,9 +604,11 @@ for reg in ["894", "914"]:
 	# Then, if still missing, set to zero if first value is missing (not -1 or -3)
 	# and multiply by 7 to get in min/week instead of min/day
 	ukb_actModVig[col_name] = np.where(pd.isnull(col) & (df.iloc[:,0] == 0), 0, 7 * col)
+
 # Weight moderate and vigorous exercise according to MVPA GWAS
 ukb["actModVig"] = 4*ukb_actModVig.new894 + 8*ukb_actModVig.new914
 actModVig = ukb.dropna(subset=["actModVig"])[["FID", "IID", "actModVig"]]
+combined = pd.concat([combined, ukb_actModVig.filter(regex="new")], axis=1)
 del ukb_actModVig
 
 
@@ -572,50 +629,68 @@ def write_pheno(df, fp, crosswalk=None):
 			.to_csv(fp+".PREPARED.txt", sep="\t", index=False, na_rep="NA")
 
 # write all data
-#crosswalk=None   # uncomment to ignore crosswalk functionality
-write_pheno(ukb[covar_cols], os.path.join(construction_fp, "ukb_covars_test"), crosswalk)
-write_pheno(dpw, os.path.join(construction_fp, "dpw/dpw_pheno"), crosswalk)
-write_pheno(educ, os.path.join(construction_fp, "educYears/educYears_pheno"), crosswalk)
-write_pheno(householdIncome, os.path.join(construction_fp, "householdIncome/householdIncome_pheno"), crosswalk)
-write_pheno(health, os.path.join(construction_fp, "healthRating/healthRating_pheno"), crosswalk)
-write_pheno(maxcpd, os.path.join(construction_fp, "maxcpd/maxcpd_pheno"), crosswalk)
-write_pheno(ageFirstBirth, os.path.join(construction_fp, "ageFirstBirth/ageFirstBirth_pheno"), crosswalk)
-write_pheno(smokeInit, os.path.join(construction_fp, "smokeInit/smokeInit_pheno"), crosswalk)
-write_pheno(bmi, os.path.join(construction_fp, "bmi/bmi_pheno"), crosswalk)
-write_pheno(cesSmoke, os.path.join(construction_fp, "cesSmoke/cesSmoke_pheno"), crosswalk)
-write_pheno(t2d, os.path.join(construction_fp, "t2d/t2d_pheno"), crosswalk)
-write_pheno(t1d, os.path.join(construction_fp, "t1d/t1d_pheno"), crosswalk)
-write_pheno(memoryTest, os.path.join(construction_fp, "memoryTest/memoryTest_pheno"), crosswalk)
-write_pheno(highBloodPressure, os.path.join(construction_fp, "highBloodPressure/highBloodPressure_pheno"), crosswalk)
-write_pheno(medsTaken, os.path.join(construction_fp, "medsTaken/medsTaken_pheno"), crosswalk)
-write_pheno(loneliness, os.path.join(construction_fp, "loneliness/loneliness_pheno"), crosswalk)
-write_pheno(smokeInit, os.path.join(construction_fp, "smokeInit/smokeInit_pheno"), crosswalk)
-write_pheno(depress, os.path.join(construction_fp, "depress/depress_pheno"), crosswalk)
-write_pheno(insomniaFrequent, os.path.join(construction_fp, "insomniaFrequent/insomniaFrequent_pheno"), crosswalk)
-write_pheno(arthritis, os.path.join(construction_fp, "arthritis/arthritis_pheno"), crosswalk)
-write_pheno(nonCancerIllness, os.path.join(construction_fp, "nonCancerIllness/nonCancerIllness_pheno"), crosswalk)
-write_pheno(anxiety, os.path.join(construction_fp, "anxiety/anxiety_pheno"), crosswalk)
-write_pheno(height, os.path.join(construction_fp, "height/height_pheno"), crosswalk)
-write_pheno(asthma, os.path.join(construction_fp, "asthma/asthma_pheno"), crosswalk)
-write_pheno(neuroticismScore, os.path.join(construction_fp, "neuroticismScore/neuroticismScore_pheno"), crosswalk)
-write_pheno(worryFeeling, os.path.join(construction_fp, "worryFeeling/worryFeeling_pheno"), crosswalk)
-write_pheno(cancerBreast, os.path.join(construction_fp, "cancerBreast/cancerBreast_pheno"), crosswalk)
-write_pheno(totChol, os.path.join(construction_fp, "totChol/totChol_pheno"), crosswalk)
-write_pheno(stroke, os.path.join(construction_fp, "stroke/stroke_pheno"), crosswalk)
-write_pheno(childrenEverFathered, os.path.join(construction_fp, "childrenEverFathered/childrenEverFathered_pheno"), crosswalk)
-write_pheno(obesitySevere, os.path.join(construction_fp, "obesitySevere/obesitySevere_pheno"), crosswalk)
-write_pheno(cancer, os.path.join(construction_fp, "cancer/cancer_pheno"), crosswalk)
-write_pheno(risk, os.path.join(construction_fp, "risk/risk_pheno"), crosswalk)
-write_pheno(alzheimer, os.path.join(construction_fp, "alzheimer/alzheimer_pheno"), crosswalk)
-write_pheno(cataract, os.path.join(construction_fp, "cataract/cataract_pheno"), crosswalk)
-write_pheno(hearingDifficulty, os.path.join(construction_fp, "hearingDifficulty/hearingDifficulty_pheno"), crosswalk)
-write_pheno(childrenEverMothered, os.path.join(construction_fp, "childrenEverMothered/childrenEverMothered_pheno"), crosswalk)
-write_pheno(cancerProstate, os.path.join(construction_fp, "cancerProstate/cancerProstate_pheno"), crosswalk)
-write_pheno(cad, os.path.join(construction_fp, "cad/cad_pheno"), crosswalk)
-write_pheno(cogPerformance, os.path.join(construction_fp, "cogPerformance/cogPerformance_pheno"), crosswalk)
-write_pheno(positiveAffect, os.path.join(construction_fp, "positiveAffect/positiveAffect_pheno"), crosswalk)
-write_pheno(lifeSatisfaction, os.path.join(construction_fp, "lifeSatisfaction/lifeSatisfaction_pheno"), crosswalk)
-write_pheno(depressScore, os.path.join(construction_fp, "depressScore/depressScore_pheno"), crosswalk)
-write_pheno(wellBeingSpectrum, os.path.join(construction_fp, "wellBeingSpectrum/wellBeingSpectrum_pheno"), crosswalk)
-write_pheno(ageParents, os.path.join(construction_fp, "ageParents90th/ageParents90th_pheno"), crosswalk)
-write_pheno(actModVig, os.path.join(construction_fp, "actModVig/actModVig_pheno"), crosswalk)
+pheno_dct = \
+	{"dpw": dpw, "educ": educ, "housholdIncome": householdIncome, "health": health, "maxcpd": maxcpd, "ageFirstBirth": ageFirstBirth, "smokeInit": smokeInit, 
+	"bmi": bmi, "cesSmoke": cesSmoke, "t2d": t2d, "t1d": t1d, "memoryTest": memoryTest, "highBloodPressure": highBloodPressure, "medsTaken": medsTaken, 
+	"loneliness": loneliness, "smokeInit": smokeInit, "depress": depress, "insomniaFrequent": insomniaFrequent, "arthritis": arthritis, "nonCancerIllness": nonCancerIllness,
+	"anxiety": anxiety, "height": height, "asthma": asthma, "neuroticismScore": neuroticismScore, "worryFeeling": worryFeeling, "cancerBreast": cancerBreast, 
+	"totChol": totChol, "stroke": stroke, "childrenEverFathered": childrenEverFathered, "obesitySevere": obesitySevere, "cancer": cancer, "risk": risk, 
+	"alzheimer": alzheimer, "cataract": cataract, "hearingDifficulty": hearingDifficulty, "childrenEverMothered": childrenEverMothered, "cancerProstate": cancerProstate, 
+	"cad": cad, "cogPerformance": cogPerformance, "positiveAffect": positiveAffect, "lifeSatisfaction": lifeSatisfaction, "depressScore": depressScore, 
+	"wellBeingSpectrum": wellBeingSpectrum, "ageParents": ageParents, "actModVig": actModVig}
+
+if individual:
+	crosswalk=None   # uncomment to ignore crosswalk functionality
+	write_pheno(ukb[covar_cols], os.path.join(construction_fp, "ukb_covars"), crosswalk)
+	for name, df in pheno_dct.items():
+		write_pheno(df, os.path.join(construction_fp, name + "/" + name + "_pheno"), crosswalk)
+
+if combine:
+	combined.to_csv(combine_fp, index=False, na_rep="NA")
+
+# write_pheno(ukb[covar_cols], os.path.join(construction_fp, "ukb_covars"), crosswalk)
+# write_pheno(dpw, os.path.join(construction_fp, "dpw/dpw_pheno"), crosswalk)
+# write_pheno(educ, os.path.join(construction_fp, "educYears/educYears_pheno"), crosswalk)
+# write_pheno(householdIncome, os.path.join(construction_fp, "householdIncome/householdIncome_pheno"), crosswalk)
+# write_pheno(health, os.path.join(construction_fp, "healthRating/healthRating_pheno"), crosswalk)
+# write_pheno(maxcpd, os.path.join(construction_fp, "maxcpd/maxcpd_pheno"), crosswalk)
+# write_pheno(ageFirstBirth, os.path.join(construction_fp, "ageFirstBirth/ageFirstBirth_pheno"), crosswalk)
+# write_pheno(smokeInit, os.path.join(construction_fp, "smokeInit/smokeInit_pheno"), crosswalk)
+# write_pheno(bmi, os.path.join(construction_fp, "bmi/bmi_pheno"), crosswalk)
+# write_pheno(cesSmoke, os.path.join(construction_fp, "cesSmoke/cesSmoke_pheno"), crosswalk)
+# write_pheno(t2d, os.path.join(construction_fp, "t2d/t2d_pheno"), crosswalk)
+# write_pheno(t1d, os.path.join(construction_fp, "t1d/t1d_pheno"), crosswalk)
+# write_pheno(memoryTest, os.path.join(construction_fp, "memoryTest/memoryTest_pheno"), crosswalk)
+# write_pheno(highBloodPressure, os.path.join(construction_fp, "highBloodPressure/highBloodPressure_pheno"), crosswalk)
+# write_pheno(medsTaken, os.path.join(construction_fp, "medsTaken/medsTaken_pheno"), crosswalk)
+# write_pheno(loneliness, os.path.join(construction_fp, "loneliness/loneliness_pheno"), crosswalk)
+# write_pheno(smokeInit, os.path.join(construction_fp, "smokeInit/smokeInit_pheno"), crosswalk)
+# write_pheno(depress, os.path.join(construction_fp, "depress/depress_pheno"), crosswalk)
+# write_pheno(insomniaFrequent, os.path.join(construction_fp, "insomniaFrequent/insomniaFrequent_pheno"), crosswalk)
+# write_pheno(arthritis, os.path.join(construction_fp, "arthritis/arthritis_pheno"), crosswalk)
+# write_pheno(nonCancerIllness, os.path.join(construction_fp, "nonCancerIllness/nonCancerIllness_pheno"), crosswalk)
+# write_pheno(anxiety, os.path.join(construction_fp, "anxiety/anxiety_pheno"), crosswalk)
+# write_pheno(height, os.path.join(construction_fp, "height/height_pheno"), crosswalk)
+# write_pheno(asthma, os.path.join(construction_fp, "asthma/asthma_pheno"), crosswalk)
+# write_pheno(neuroticismScore, os.path.join(construction_fp, "neuroticismScore/neuroticismScore_pheno"), crosswalk)
+# write_pheno(worryFeeling, os.path.join(construction_fp, "worryFeeling/worryFeeling_pheno"), crosswalk)
+# write_pheno(cancerBreast, os.path.join(construction_fp, "cancerBreast/cancerBreast_pheno"), crosswalk)
+# write_pheno(totChol, os.path.join(construction_fp, "totChol/totChol_pheno"), crosswalk)
+# write_pheno(stroke, os.path.join(construction_fp, "stroke/stroke_pheno"), crosswalk)
+# write_pheno(childrenEverFathered, os.path.join(construction_fp, "childrenEverFathered/childrenEverFathered_pheno"), crosswalk)
+# write_pheno(obesitySevere, os.path.join(construction_fp, "obesitySevere/obesitySevere_pheno"), crosswalk)
+# write_pheno(cancer, os.path.join(construction_fp, "cancer/cancer_pheno"), crosswalk)
+# write_pheno(risk, os.path.join(construction_fp, "risk/risk_pheno"), crosswalk)
+# write_pheno(alzheimer, os.path.join(construction_fp, "alzheimer/alzheimer_pheno"), crosswalk)
+# write_pheno(cataract, os.path.join(construction_fp, "cataract/cataract_pheno"), crosswalk)
+# write_pheno(hearingDifficulty, os.path.join(construction_fp, "hearingDifficulty/hearingDifficulty_pheno"), crosswalk)
+# write_pheno(childrenEverMothered, os.path.join(construction_fp, "childrenEverMothered/childrenEverMothered_pheno"), crosswalk)
+# write_pheno(cancerProstate, os.path.join(construction_fp, "cancerProstate/cancerProstate_pheno"), crosswalk)
+# write_pheno(cad, os.path.join(construction_fp, "cad/cad_pheno"), crosswalk)
+# write_pheno(cogPerformance, os.path.join(construction_fp, "cogPerformance/cogPerformance_pheno"), crosswalk)
+# write_pheno(positiveAffect, os.path.join(construction_fp, "positiveAffect/positiveAffect_pheno"), crosswalk)
+# write_pheno(lifeSatisfaction, os.path.join(construction_fp, "lifeSatisfaction/lifeSatisfaction_pheno"), crosswalk)
+# write_pheno(depressScore, os.path.join(construction_fp, "depressScore/depressScore_pheno"), crosswalk)
+# write_pheno(wellBeingSpectrum, os.path.join(construction_fp, "wellBeingSpectrum/wellBeingSpectrum_pheno"), crosswalk)
+# write_pheno(ageParents, os.path.join(construction_fp, "ageParents90th/ageParents90th_pheno"), crosswalk)
+# write_pheno(actModVig, os.path.join(construction_fp, "actModVig/actModVig_pheno"), crosswalk)
