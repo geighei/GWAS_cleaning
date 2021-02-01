@@ -56,8 +56,8 @@ legend = pd.read_csv(args.legend_fp, delim_whitespace=True, usecols=legend_cols)
 ## CLEAN AND MERGE DATA
 # clean summary statistic coordinate column to ensure we get as many matches as possible
 if not args.is_23andMe:
-	# needed for parental longevity (deelen)
-	sumstat[args.sumstat_coord_name] = sumstat[args.sumstat_coord_name].str.replace(":ID", "")
+	# needed for parental longevity (deelen) and blood pressure traits (evangelou)
+	sumstat[args.sumstat_coord_name] = sumstat[args.sumstat_coord_name].str.replace(":(ID|SNP|INDEL)", "")
 	# needed for osteoarthritis
 	sumstat[args.sumstat_coord_name] = sumstat[args.sumstat_coord_name].str.replace("_.*$", "")
 
