@@ -10,7 +10,7 @@
 ## PLEASE MAKE SURE THAT ALL INSTANCES OF "FILL _ IN" and "SDY _ FILL" ARE FIXED ##
 
 ### Please DEFINE here format and input columns of the following EASYIN files
-DEFINE	--pathOut /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw/easyqc
+DEFINE	--pathOut /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/height/easyqc
 		--strMissing NA
 		--strSeparator WHITESPACE
 		--acolIn ID;ALLELE0;ALLELE1;CHROM;GENPOS;N;BETA;SE;LOG10P;A1FREQ;INFO
@@ -25,7 +25,7 @@ DEFINE	--pathOut /home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction/dpw
 
 ### Falls outside loop, issue? Richard constructs many of these files...solve
 
-EASYIN	--fileIn /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/dpw/ukb_dpw_split1.txt --fileInShortName dpw_split1 --astrSetNumCol MAF_THRESHOLD=0.005;INFO_THRESHOLD=0.9;SDY=11.6
+EASYIN	--fileIn /home/ubuntu/biroli/geighei/data/GWAS_sumstats/clean/UKB/height/ukb_height_split1.txt --fileInShortName height_split1 --astrSetNumCol MAF_THRESHOLD=0.005;INFO_THRESHOLD=0.9;SDY=9.25
 
 ##############################################################
 ## 0. Start EasyQC scripting interface                      ##
