@@ -66,6 +66,6 @@ awk 'FNR==1 && NR!=1{next;}{print}' ${tmpout}*${pheno}.regenie > $out
 # store number of samples for which we have the phenotype; this is an estimate, should be good enough
 lines=($(wc -l $keep))
 # append column with this value in all places to our summary statistics
-sed -i '1s/$/ N/; 2,$s/$/'$lines'/' $out
+sed -i '1s/$/ N/; 2,$s/$/ '$lines'/' $out
 # remove regenie files after doing this because they take up too much space on the drive
 rm $tmpout*.regenie
