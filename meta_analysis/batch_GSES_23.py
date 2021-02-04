@@ -4,7 +4,7 @@ import os
 #from shutil import move
 
 # directories
-code_dir = "/home/ubuntu/biroli/geighei/code/GWAS_cleaning/Meta_analysis/"
+code_dir = "/home/ubuntu/biroli/geighei/code/GWAS_cleaning/meta_analysis/"
 gwas_dir = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/"
 gwas_dir_main = gwas_dir + "clean/rGE/"
 gwas_dir_23 = gwas_dir + "clean/23andMe/"
