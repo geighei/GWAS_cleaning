@@ -15,9 +15,9 @@ All code involving the construction, cleaning, processing, standardizing, "mungi
 
   ## RS_mapping
   - Purpose: codes to help mapping RS numbers into summary statistics that don't already have them (e.g. only have CHR-POS coordinates)
-  - compile_rsid_map.py is a compiles all RSIDs (unique SNP identifiers) from the HRC and 1000 genomes panels and combines into a minimal text file for use mapping from CHR:POS coordinates to SNP
+  - compile_rsid_map.py compiles all RSIDs from the HRC and 1000 genomes panels and combines into a minimal text file for use mapping from CHR:POS coordinates to SNP
   - RS_Merge_Diagnostics.R is a script which provides information about the percentage of SNPs in a sumstat that have RS numbers, by p-value level
-  - mergeToRS.py is a program with command-line options which maps RSIDs given coordinates of structure CHR:POS by merging with a combined legend file from the 1000 Genomes project
+  - mergeToRS.py is a program with command-line options which merges the RSIDs legend file (e.g. that from compile_rsid_map.py) to given coordinates of structure CHR:POS to map to RSIDs
   - batch_23andMe.sh is a script that calls mergeToRS.py for all 23&me sumstats
   
   ## SNP_heritability
@@ -26,7 +26,8 @@ All code involving the construction, cleaning, processing, standardizing, "mungi
   ## construction
   - Purpose: Construct our own GWASs in UKB using regenie tool and sanity check result with EasyQC
   - preprocess_ukb.py is a script for extracting the necessary components of the UKB phenotypic data for use in UKB GWAS construction in regenie. This mostly means defining and extracting phenotypes and covariates and writing them to individual files
-  - dpw_ukb_regenie.sh is a script for running a GWAS on drinks per week in the UKB using regenie
-  - ten_fold_gwas.py is a script for running a GWAS on a phenotype in UKB using a 10-fold cross-validation technique, necessary if we are to then use this GWAS to construct PGS for individuals in the UKB
-  - rGSES_top_phenotypes.xlsx is the spreadsheet where we are currently documenting the UKB variables that map to each selected phenotype for rGSES/GxSES work
-  - qc_checks/ holds the EasyQC scripts for analysis of the GWASs we construct
+  - single_pheno_regenie.sh is a command-line bash script for running a GWAS on a single phenotype in the UKB using regenie
+  - split_sample_regenie.py is a wrapper/master script of single_pheno_regenie.sh. It performs necessary set-up like creating directories. It also allows for running multiple GWASs on an arbitrary number of random "splits" of the sample (e.g. 10-fold cross validation or two splits for ORIV). It also automates the EasyQC diagnostic process after the GWASs are complete.
+  - build_ecf.py is a function which reads in a template ECF script and edits the placeholders based on the function inputs and then writes the result to a new ECF script
+  - Run_EasyQC.R is a short script that simply runs EasyQC on an ECF script inputted at the command line
+  - ecf_scripts/ holds the EasyQC scripts for analysis of the GWASs we construct, including the template script which is used to automatically generate other ECF scripts
