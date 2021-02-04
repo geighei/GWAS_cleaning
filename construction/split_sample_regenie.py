@@ -70,7 +70,7 @@ for fold in np.arange(1,args.n_folds+1):
 	# select fold subset and write to drive
 	fold_ids = samples[samples.fold == fold][["FID", "IID"]]
 	fold_ids_path = os.path.join(regenie_out_path, "fold"+str(fold)+".txt")
-	#fold_ids.to_csv(fold_ids_path, sep="\t", index=False, header=False)
+	fold_ids.to_csv(fold_ids_path, sep="\t", index=False, header=False)
 	# save path names which are used more than once
 	pheno_split_name = args.pheno+"_split"+str(fold)
 	gwas_out_path = os.path.join(out_path, args.pheno, "ukb_"+pheno_split_name+".txt")
@@ -87,7 +87,7 @@ for fold in np.arange(1,args.n_folds+1):
 		"--keep", fold_ids_path,
 		"--tmpout", os.path.join(regenie_out_path, "ukb_"+args.pheno),
 		"--out", gwas_out_path]
-	# run = subprocess.run(cmd)
+	run = subprocess.run(cmd)
 	
 	# RUN EASYQC --------------------------- #
 	if fold > 2:
