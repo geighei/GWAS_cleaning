@@ -15,12 +15,11 @@ import numpy as np
 import subprocess
 import os
 import argparse
-from random import seed
 from contextlib import suppress
 from build_ecf import build_ecf
 
 # set seed so result of GWAS is fully replicable (assignment of folds is random)
-seed(112794)
+np.random.seed(112794)
 
 ### COMMAND-LINE INPUTS --------------------------------- ###
 parser = argparse.ArgumentParser(description='Process inputs.')
@@ -71,11 +70,11 @@ for fold in np.arange(1,args.n_folds+1):
 	# select fold subset and write to drive
 	fold_ids = samples[samples.fold == fold][["FID", "IID"]]
 	fold_ids_path = os.path.join(regenie_out_path, "fold"+str(fold)+".txt")
-	fold_ids.to_csv(fold_ids_path, sep="\t", index=False, header=False)
+	#fold_ids.to_csv(fold_ids_path, sep="\t", index=False, header=False)
 	# save path names which are used more than once
-	pheno_split_name = args.pheno+"_split"_str(fold)
+	pheno_split_name = args.pheno+"_split"+str(fold)
 	gwas_out_path = os.path.join(out_path, args.pheno, "ukb_"+pheno_split_name+".txt")
-	ecf_path = os.path.join("ecf_scripts", "easyqc_UKB_"+pheno_split_name+".ecf")
+	ecf_path = os.path.join("ecf_scripts", "ukb_"+pheno_split_name+".ecf")
 	# call script which executes regenie and compiles output according to our specification
 	cmd = ["./single_pheno_regenie.sh", 
 		"--dir", construction_path,
@@ -88,9 +87,11 @@ for fold in np.arange(1,args.n_folds+1):
 		"--keep", fold_ids_path,
 		"--tmpout", os.path.join(regenie_out_path, "ukb_"+args.pheno),
 		"--out", gwas_out_path]
-	run = subprocess.run(cmd)
-
+	# run = subprocess.run(cmd)
+	
 	# RUN EASYQC --------------------------- #
+	if fold > 2:
+		continue    # For now, we are running EasyQC on first two folds if they exist
 	# Build ECF script which will run EasyQC on the GWAS we just ran
 	build_ecf(
 		template_path=os.path.join("ecf_scripts", "TEMPLATE_easyqc.ecf"),

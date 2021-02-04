@@ -1,10 +1,4 @@
-import pandas as pd
-
-def build_ecf(
-	# path to template ECF file with placeholders we will replace
-	template_path="/home/ubuntu/biroli/geighei/code/GWAS_cleaning/construction/ecf_scripts/TEMPLATE_easyqc.ecf", 
-	pheno_path=None, out_ecf, 
-	path_out, file_in, sdy=None):
+def build_ecf(template_path, out_ecf, path_out, file_in, sdy=None, pheno_path=None):
 	# error checking
 	if pheno_path is None and sdy is None:
 		raise ValueError("'build_ecf' function must be supplied either 'pheno_path' or 'sdy' argument")
