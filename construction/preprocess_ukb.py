@@ -68,11 +68,11 @@ ukb_cols = ["31",		# Gender
 			"20460",	# Life Satisfaction	  	
 			"20016", 	# Cognitive Performance
 			"894", "914", #"884", "904",		
-						# Moderate-to-vigorous physical activity
+			# Moderate-to-vigorous physical activity
 			"2946", "1807", "1845", "3526",
-						# Parental longevity
+			# Parental longevity
 			"20514", "20510", "20517" , "20519", "20511", "20507", "20508", "20518", "20513"      
-						# Depressive symptoms
+			# Depressive symptoms
 			]
 
 # construct iterator to read zipped file in chunks to minimize computation and memory usage
@@ -146,10 +146,10 @@ del ukb_dpw
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100305
 # I mapped 5 (NVQ) to nan since it's too ambiguous and 6 is a rough approximation
 #educ_dict = {1: 16, 2: 12, 3: 10, 4: 10, 5: np.nan, 6: 14, -7: np.nan, -3: np.nan}
-educ_dict = {1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1, -7: np.nan, -3: np.nan}
+educ_dict = {1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1, -7: 0, -3: np.nan}
 # convert all "qualification" columns to years of education
 educ_cols = [col for col in ukb.columns if re.search("^6138-", col)]
-ukb[educ_cols] = ukb[educ_cols].applymap(lambda x: educ_dict.get(x,0))
+ukb[educ_cols] = ukb[educ_cols].applymap(lambda x: educ_dict.get(x))
 # take maximum value reported, send to new column
 ukb["educYears"] = ukb[educ_cols].max(axis=1)
 # filter columns to only keep fid, iid, and education and rows to remove missing education
@@ -160,7 +160,7 @@ combined = pd.concat([combined, ukb[educ_cols]], axis=1)
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100294
 householdIncome_dict = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5}
 householdIncome_cols = [col for col in ukb.columns if re.search("^738-", col)]
-ukb[householdIncome_cols] = ukb[householdIncome_cols].applymap(lambda x: householdIncome_dict.get(x,0))
+ukb[householdIncome_cols] = ukb[householdIncome_cols].applymap(lambda x: householdIncome_dict.get(x))
 # went with maximum since an average might be skewed by retirement, lay-offs, etc
 ukb["householdIncome"] = ukb[householdIncome_cols].max(axis=1)
 householdIncome = ukb.dropna(subset=["householdIncome"])[["FID", "IID", "householdIncome"]]
@@ -170,7 +170,7 @@ combined = pd.concat([combined, ukb[householdIncome_cols]], axis=1)
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100508
 health_dict = {1: 4, 2: 3, 3: 2, 4: 1}
 health_cols = [col for col in ukb.columns if re.search("^2178-", col)]
-ukb[health_cols] = ukb[health_cols].applymap(lambda x: health_dict.get(x,0))
+ukb[health_cols] = ukb[health_cols].applymap(lambda x: health_dict.get(x))
 # average health
 ukb["healthRating"] = ukb[health_cols].mean(axis=1)
 health = ukb.dropna(subset=["healthRating"])[["FID", "IID", "healthRating"]]
@@ -241,7 +241,7 @@ del ukb_t2d
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=41204
 t1d_dict = {"E100": 1, "E101": 1, "E102": 1, "E103": 1, "E104": 1, "E105": 1, "E106": 1, "E107": 1, "E108": 1, "E109": 1}
 ukb_t1d = ukb[diagnosis_cols].applymap(lambda x: t1d_dict.get(x, 0))
-# use first available observation to maintain consistency across individuals since it's binary
+# select any observation equal to 1
 ukb["t1d"] = ukb_t1d.max(axis=1)
 t1d = ukb.dropna(subset=["t1d"])[["FID", "IID", "t1d"]]
 combined = pd.concat([combined, ukb.loc[:, "t1d"]], axis=1)
@@ -268,7 +268,7 @@ highBloodPressure = ukb.dropna(subset=["highBloodPressure"])[["FID", "IID", "hig
 combined = pd.concat([combined, ukb_highBloodPressure], axis=1)
 del ukb_highBloodPressure
 
-# TREATMENTS / MADICATIONS TAKEN 
+# TREATMENTS / MEDICATIONS TAKEN 
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=137
 medsTaken_cols = [col for col in ukb.columns if re.search("^137-", col)]
 # use average value across individuals 
