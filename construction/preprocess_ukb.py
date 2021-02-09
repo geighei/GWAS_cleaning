@@ -97,7 +97,7 @@ if "crosswalk_fp" in locals():
 # remove leading "f." from column names if present
 ukb.rename(columns=lambda x: re.sub("^f\.", "", x), inplace=True)
 # format so first separator is "-" (e.g. 31-0.0)
-ukb.rename(columns=lambda x: re.sub(r"([0-9]+)\.([0-9]+)", r"\1-\2", x), inplace=True)
+ukb.rename(columns=lambda x: re.sub(r"^([0-9]+)\.([0-9]+)", r"\1-\2", x), inplace=True)
 
 # can turn this off to get largest possible list of individuals if desired
 if filtered:
