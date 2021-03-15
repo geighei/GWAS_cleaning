@@ -113,9 +113,10 @@ covar_cols = [col for col in ukb.columns if re.search("^(FID|IID|31-0\.0|34-0\.0
 
 # set of columns to use for all self-reported diagnoses
 diagnosis_cols = [col for col in ukb.columns if re.search("^4120(2|4)-", col)]
+# diagnosis_cols = [col for col in ukb.columns if re.search("^41204-", col)]
 # ukb[diagnosis_cols] = ukb[diagnosis_cols].fillna('')
 # diagnoses = ukb[diagnosis_cols].apply(lambda row: ''.join(row.values.astype(str)), axis=1)
-# diagnoses.to_csv("archive/diagnosis_codes.csv")
+# diagnoses.to_csv("archive/diagnosis_codes_full.csv")
 
 # create a data frame for the pertinent and cleaned columns to write out in combined form for future computation
 
@@ -282,7 +283,7 @@ smokeInit_dict = {-3: np.nan, 2: 1}
 smokeInit_cols = [col for col in ukb.columns if re.search("^20116-", col)]
 ukb[smokeInit_cols] = ukb[smokeInit_cols].applymap(lambda x: smokeInit_dict.get(x,x))
 # use last available observation as there shouldn't be inconsistencies
-ukb["smokeInit"] = ukb[smokeInit_cols].ffill(axis=1).iloc[:,0]
+ukb["smokeInit"] = ukb[smokeInit_cols].max(axis=1)
 smokeInit = ukb.dropna(subset=["smokeInit"])[["FID", "IID", "smokeInit"]]
 
 # UNIPOLAR DEPRESSION
