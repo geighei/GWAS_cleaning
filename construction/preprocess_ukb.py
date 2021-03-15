@@ -217,7 +217,8 @@ bmi = ukb.dropna(subset=["bmi"])[["FID", "IID", "bmi"]]
 
 # SMOKING CESSATION
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=90
-cesSmoke_dict = {2: 0, 1: 1, 0: 0}
+# never smokers are coded as missing
+cesSmoke_dict = {2: 0, 1: 1, 0: np.nan}
 cesSmoke_cols = [col for col in ukb.columns if re.search("^20116-", col)]
 ukb[cesSmoke_cols] = ukb[cesSmoke_cols].applymap(lambda x: cesSmoke_dict.get(x))
 # use first available observation to maintain consistency across individuals since it's binary
