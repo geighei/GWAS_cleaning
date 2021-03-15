@@ -14,7 +14,7 @@
 DEFINE	--pathOut {placeholder_pathOut}
 		--strMissing NA
 		--strSeparator WHITESPACE
-		--acolIn ID;ALLELE0;ALLELE1;CHROM;GENPOS;N;BETA;SE;LOG10P;A1FREQ;INFO
+		--acolIn ID;ALLELE1;ALLELE0;CHROM;GENPOS;N;BETA;SE;LOG10P;A1FREQ;INFO
 		#--acolInClasses character;character;character;character;character;numeric;numeric;numeric;numeric;numeric;numeric;numeric;numeric
 		--acolNewName SNP;EFFECT_ALLELE;OTHER_ALLELE;CHR;BP;N;BETA;SE;LOG10P;AAF;IMPUTATION
 
