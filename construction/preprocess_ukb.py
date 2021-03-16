@@ -162,7 +162,7 @@ educ = ukb.dropna(subset=["educYears"])[["FID", "IID", "educYears"]]
 
 # HOUSEHOLD INCOME
 # https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=100294
-householdIncome_dict = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5}
+householdIncome_dict = {1: 18000, 2: 24500, 3: 41500, 4: 76000, 5: 100000}
 householdIncome_cols = [col for col in ukb.columns if re.search("^738-", col)]
 ukb[householdIncome_cols] = ukb[householdIncome_cols].applymap(lambda x: householdIncome_dict.get(x))
 # went with maximum since an average might be skewed by retirement, lay-offs, etc
