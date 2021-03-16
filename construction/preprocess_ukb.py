@@ -7,7 +7,7 @@ import subprocess
 ### DEFINE FILE PATHS
 construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction"
 #crosswalk_fp = os.path.join(construction_fp, "ukb_v3_newbasket.s487395.crosswalk")
-ukb_fp = "/home/ubuntu/biroli/ukb/ukb23283.csv"
+ukb_fp = "/home/ubuntu/biroli/ukb/ukb42349.csv"
 sibs_fp = "/home/ubuntu/biroli/ukb/Siblings/output/UKB2_FS_withfam.txt"
 individual=True
 filtered=True
