@@ -364,10 +364,11 @@ worryFeeling = ukb.dropna(subset=["worryFeeling"])[["FID", "IID", "worryFeeling"
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=40006
 cancerBreast_dict = {"C500": 1, "C501": 1, "C502": 1, "C503": 1, "C504": 1, "C505": 1, "C506": 1, "C507": 1, "C508": 1, "C509": 1}
 cancerBreast_cols = [col for col in ukb.columns if re.search("^40006-", col)]
-ukb[cancerBreast_cols] = ukb[cancerBreast_cols].applymap(lambda x: cancerBreast_dict.get(x, 0))
+ukb_cancerBreast = ukb[cancerBreast_cols].applymap(lambda x: cancerBreast_dict.get(x, 0))
 # First available observation
-ukb["cancerBreast"] = ukb[cancerBreast_cols].max(axis=1)
+ukb["cancerBreast"] = ukb_cancerBreast.max(axis=1)
 cancerBreast = ukb.dropna(subset=["cancerBreast"])[["FID", "IID", "cancerBreast"]]
+del ukb_cancerBreast
 
 # CHOLESTEROL
 # https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=30690
@@ -462,12 +463,13 @@ childrenEverMothered = ukb.dropna(subset=["childrenEverMothered"])[["FID", "IID"
 
 # PROSTATE CANCER
 # http://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=20001
-cancerProstate_dict = {1002: 1}
-cancerProstate_cols = [col for col in ukb.columns if re.search("^20001-", col)]
-ukb[cancerProstate_cols] = ukb[cancerProstate_cols].applymap(lambda x: cancerProstate_dict.get(x, 0))
-# use max observation as there shouldn't be inconsistencies
-ukb["cancerProstate"] = ukb[cancerProstate_cols].max(axis=1)
+cancerProstate_dict = {"C61": 1}
+cancerProstate_cols = [col for col in ukb.columns if re.search("^40006-", col)]
+ukb_cancerProstate = ukb[cancerProstate_cols].applymap(lambda x: cancerProstate_dict.get(x, 0))
+# use max observation as there shouldn't be inconsistencies; mark female participants as missing
+ukb["cancerProstate"] = np.where(ukb["31-0.0"] == 0, np.nan, ukb_cancerProstate.max(axis=1))
 cancerProstate = ukb.dropna(subset=["cancerProstate"])[["FID", "IID", "cancerProstate"]]
+del ukb_cancerProstate
 
 # CORONARY HEART DISEASE
 # https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41204
