@@ -21,11 +21,11 @@ options(scipen = 999)
 options(digits = 4)
 setwd('/Volumes/g_econ_department$/econ/biroli/geighei/data/GWAS_sumstats/construction/')
 # number calculated by number of lines in ukb_covars.txt file ("wc -l ukb_covars.txt" in terminal)
-total_n = 370008
+total_n = 371838
 
 ##
 summarizePheno <- function(df){
-  pheno <- df[[3]]
+  pheno <- as.numeric(df[[3]])
   pheno_name <- names(df)[3]
   n <- length(pheno)
   pct_missing <- 1 - (n/total_n)

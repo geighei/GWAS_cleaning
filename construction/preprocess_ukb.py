@@ -542,7 +542,7 @@ ukb_ageParents = ukb[ageParents_cols]
 ukb_ageParents["fatherDeath"] = ukb_ageParents.filter(regex="1807").max(axis=1)
 ukb_ageParents["motherDeath"] = ukb_ageParents.filter(regex="3526").max(axis=1)
 ukb_ageParents["fatherAge"] = ukb_ageParents.filter(regex="2946").max(axis=1)
-ukb_ageParents["motherAge"] = ukb_ageParents.filter(regex="1845").max(axmis=1)
+ukb_ageParents["motherAge"] = ukb_ageParents.filter(regex="1845").max(axis=1)
 # Calculate 90th percentile of death age for fathers and mothers separately, excluding Nan's
 (father90th, mother90th) = (np.nanpercentile(ukb_ageParents.fatherDeath, 90), np.nanpercentile(ukb_ageParents.motherDeath, 90))
 # Individuals marked for parental longevity trait if either mother or father died at or survived to an age >= 90th percentile
