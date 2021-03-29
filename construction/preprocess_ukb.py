@@ -7,7 +7,7 @@ import subprocess
 ### DEFINE FILE PATHS
 construction_fp = "/home/ubuntu/biroli/geighei/data/GWAS_sumstats/construction"
 #crosswalk_fp = os.path.join(construction_fp, "ukb_v3_newbasket.s487395.crosswalk")
-ukb_fp = "/home/ubuntu/biroli/ukb/ukb42349.csv"
+ukb_fp = "/home/ubuntu/biroli/ukb/ukb46068.csv"
 sibs_fp = "/home/ubuntu/biroli/ukb/Siblings/output/UKB2_FS_withfam.txt"
 individual=True
 filtered=True
@@ -513,9 +513,8 @@ depressScore_cols = [col for col in ukb.columns if re.search("^(20514|20510|2051
 # Subset the columns and standardize so no days of depressive symptomize is 0
 ukb_depressScore = ukb[depressScore_cols]
 ukb_depressScore = ukb_depressScore.applymap(lambda x: depressScore_dict.get(x))
-ukb_depressScore["nanCount"] = ukb_depressScore.isna().sum(axis=1)
 # Sum all scores 
-ukb["depressScore"] = np.where(ukb_depressScore.nanCount > 4, np.nan, ukb_depressScore.sum(axis=1))
+ukb["depressScore"] = ukb_depressScore.mean(axis=1)
 depressScore = ukb.dropna(subset=["depressScore"])[["FID", "IID", "depressScore"]]
 del ukb_depressScore
 
