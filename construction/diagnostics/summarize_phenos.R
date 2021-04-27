@@ -21,7 +21,7 @@ options(scipen = 999)
 options(digits = 4)
 setwd('/Volumes/g_econ_department$/econ/biroli/geighei/data/GWAS_sumstats/construction/')
 # number calculated by number of lines in ukb_covars.txt file ("wc -l ukb_covars.txt" in terminal)
-total_n = 371838
+total_n = 371580
 
 ##
 summarizePheno <- function(df){
@@ -41,10 +41,15 @@ summarizePheno <- function(df){
 
 files <- list.files(pattern = "_pheno.txt", recursive = TRUE)
 files <- str_subset(files, "cv10fold", negate = TRUE)
+# remove Andries's Cartesius phenotypes
+files <- str_subset(files, "artesius", negate = TRUE)
 df_list <- files %>% 
   map(read_table2)
 summary <- df_list %>%
   map(summarizePheno) %>%
   reduce(bind_rows)
-
-write_csv(summary, "ukb_phenos_summary.csv")
+joined <- df_list %>%
+  keep(~ nrow(.) > 0) %>%
+  reduce(full_join, by = c("FID", "IID"))
+write_csv(summary, "ukb_phenos_summary_CARTESIUS.csv")
+write_csv(joined, "ukb_phenos_joined.csv")
