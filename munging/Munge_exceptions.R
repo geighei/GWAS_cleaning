@@ -24,7 +24,7 @@ negate_list <- c(
   # Smoking cessation was defined as 2 for current smokers and 1 for former smokers, the directional opposite of our
   # phenotypic measure, which codes current smokers as 0 and former smokers as 1, so we leave it alone
   'drinkWeek','maxCPD', 'ageSmoke', 'smokeInit', 'dpw', # added these to negate_list instead because flipping alleles doesn't work with PRS-cs
-  'cancerBreast', 'memoryTest'
+  'cancerBreast', 'memoryTest', 'depressScore'
   )
 master_list <-  c(flip_list, negate_list)
 
